@@ -1,0 +1,16 @@
+{
+  "name": "younsl",
+  "owner": {
+    "name": "younsl"
+  },
+  "metadata": {
+    "description": "SRE skill stacks for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "houston",
+      "source": "./houston",
+      "description": "SRE skill stack. oncall-mode triages every task into a runbook and applies verification-first principles across Kubernetes, Helm, Terraform, observability, releases, and incidents."
+    }
+  ]
+}
