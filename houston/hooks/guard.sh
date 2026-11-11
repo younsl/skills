@@ -13,8 +13,10 @@ emit() {
   exit 0
 }
 
+tool_word="(^|[^a-z0-9_-])($tools)([^a-z0-9_-]|$)"
+
 if ! command -v jq >/dev/null 2>&1; then
-  if [[ "$payload" =~ (^|[^a-z-])($tools)([^a-z-]|$) ]]; then
+  if [[ "$(tr '[:upper:]' '[:lower:]' <<<"$payload")" =~ $tool_word ]]; then
     emit ask "houston guard cannot parse the command without jq. Confirm this Terraform-family command is safe."
   fi
   exit 0
@@ -33,7 +35,7 @@ raise() {
   fi
 }
 
-normalized="$(tr -d "'\"\\\\" <<<"$cmd")"
+normalized="$(tr -d "'\"\\\\" <<<"$cmd" | tr '[:upper:]' '[:lower:]')"
 nl=$'\n'
 segments="$normalized"
 # shellcheck disable=SC2016
@@ -41,10 +43,13 @@ for sep in '&&' '||' '$(' ';' '|' '&' '`' '(' ')' '{' '}' '<' '>'; do
   segments="${segments//"$sep"/$nl}"
 done
 
-all_tokens=" $(tr -s '[:space:]' ' ' <<<"$normalized") "
 has_tool=false
-for token in $all_tokens; do
-  [[ "$(basename -- "$token")" =~ ^($tools)$ ]] && has_tool=true
+[[ "$normalized" =~ $tool_word ]] && has_tool=true
+has_danger=false
+for token in $(tr -s '[:space:]' ' ' <<<"$normalized"); do
+  case "$token" in
+    apply | apply-all | destroy | destroy-all | -destroy | -destroy=*) has_danger=true ;;
+  esac
 done
 
 check_tool() {
@@ -105,6 +110,10 @@ while IFS= read -r segment; do
       ;;
   esac
 done <<<"$segments"
+
+if [[ -z "$decision" ]] && $has_tool && $has_danger; then
+  raise ask "The command mentions a Terraform-family tool together with apply or destroy in a form houston guard cannot verify. Confirm it does not run a raw apply or destroy."
+fi
 
 [[ -n "$decision" ]] || exit 0
 emit "$decision" "$reason"
