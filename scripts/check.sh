@@ -25,6 +25,22 @@ for skill in houston/skills/*/; do
   grep -qE '^description: *[^ ]' "$file" || err "$file: description is empty"
   lines="$(wc -l <"$file" | tr -d ' ')"
   (( lines <= 500 )) || err "$file: $lines lines, limit is 500"
+  case "$name" in
+    principle-* | dc) continue ;;
+  esac
+  evals="$dir/evals/evals.json"
+  if [[ ! -f "$evals" ]]; then
+    err "$dir has no evals/evals.json"
+  elif ! jq -e --arg n "$name" '
+      def text: type == "string" and length > 0;
+      .skill_name == $n
+      and (.evals | type == "array" and length > 0)
+      and all(.evals[]; (.id | type == "number") and (.name | text) and (.prompt | text) and (.expected_output | text))
+      and (.evals | map(.id) | unique | length) == (.evals | length)
+      and (.evals | map(.name) | unique | length) == (.evals | length)
+    ' "$evals" >/dev/null 2>&1; then
+    err "$evals: needs skill_name $name and evals with unique id and name, and non-empty prompt and expected_output"
+  fi
 done
 
 python3 scripts/skill-toc.py houston/skills/*/SKILL.md >/dev/null || err "skill-toc rewrote a Contents section, review and commit it"

@@ -1,0 +1,26 @@
+{
+  "skill_name": "diagram",
+  "evals": [
+    {
+      "id": 1,
+      "name": "architecture-for-wiki",
+      "prompt": "로그 수집 파이프라인 아키텍처 다이어그램 그려서 위키 페이지에 넣어줘",
+      "expected_output": "Hand-written SVG, no Mermaid; title is the message as a sentence, not a topic name; flows left to right in traffic order with arrows that never cross another box; black background with faint grid, the stated card colors, one accent color, and a category badge top right; open source components carry official logos as data URIs; 1200px canvas rendered to PNG at 2x; SVG kept under docs assets; wiki embeds the PNG as an attachment in a centered paragraph with explicit width and links the SVG; writing-style character check on SVG text returns nothing.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "before-after-chart",
+      "prompt": "p99 레이턴시 개선 전후 비교 차트 이미지 만들어줘",
+      "expected_output": "Uses only numbers measured for a stated window and asks for or queries the data instead of inventing values; one message per image with the result as the title sentence; current in white and baseline in gray #4d4d4d, 2px lines, thin grid, red only for regression; PNG is twice the SVG width.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "leadership-deck",
+      "prompt": "옵저버빌리티 비용 절감 결과 리더십 보고용 발표 자료 5장 만들어줘",
+      "expected_output": "Writes one self-contained file under the owning repo's docs slides directory and adds it to the index, never a hosted artifact; pure black slides with one image and one caption line each and slide numbers as current and total; every slide claim backed by a measured number; general terms instead of product names for a leadership audience; no CDN references, assets by relative path.",
+      "files": []
+    }
+  ]
+}

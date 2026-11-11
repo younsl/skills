@@ -1,0 +1,33 @@
+{
+  "skill_name": "go-generator",
+  "evals": [
+    {
+      "id": 1,
+      "name": "queue-duration-metric",
+      "prompt": "Go 서비스에 작업 큐 처리 시간 메트릭 추가해줘",
+      "expected_output": "Adds a histogram with an English Help string; label names stay outside cluster, container, endpoint, instance, job, namespace, pod, and service; registers it on the existing dedicated metrics listener, not the traffic port; runs gofmt -w on changed packages and repeats go fix until go fix -diff prints nothing; go vet and go test pass; reports the metric as not done until its series and labels are read back from the metrics backend after deploy.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "cluster-label-without-new-key",
+      "prompt": "메트릭에 클러스터 이름 라벨 붙이게 config에 cluster 키 추가해줘",
+      "expected_output": "Detects the cluster identity at runtime from the API or reuses a value another config block already holds before adding a key, and states the detection path; does not name the label cluster because it collides with a target label and arrives as exported_cluster; picks a non-reserved label name and explains why; any config key that remains uses a one-line `# -- (type) description` comment above it and block-style maps.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "long-running-sync-job",
+      "prompt": "레포 동기화 잡 API 추가하고 진행 상황 로그 남겨줘",
+      "expected_output": "Registers the new endpoint in the OpenAPI document with request and response schemas; persists progress before each step and reattaches the job after a pod restart; slog messages are short lowercase plain English with durations as rounded strings, never integer nanoseconds; user-facing error bodies stay in the product's language; existing log lines are not rewritten; no file header comment block; gofmt and go fix loop passes.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "local-smoke-run",
+      "prompt": "로컬에서 띄워서 새 엔드포인트 동작 확인해줘",
+      "expected_output": "Runs the service on a high port from a config copy outside the repo without editing tracked config; checks the port is free before the smoke test; calls the endpoint with curl and shows the response; stops the instance by its own port with lsof -tiTCP, never by a process-name pattern such as pkill go.",
+      "files": []
+    }
+  ]
+}

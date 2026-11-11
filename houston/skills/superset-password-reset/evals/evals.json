@@ -1,0 +1,26 @@
+{
+  "skill_name": "superset-password-reset",
+  "evals": [
+    {
+      "id": 1,
+      "name": "db-auth-reset",
+      "prompt": "superset 패스워드 초기화해줘. user@example.com",
+      "expected_output": "Reads AUTH_TYPE from the running app via create_app, not from superset_config.py; confirms the target's id, username, active, roles, last_login, and login_count; with AUTH_DB hands the operator the kubectl exec superset fab reset-password --username command to run in a separate terminal and never passes --password; reports an empty role list if found; after the operator confirms, list-users shows the user active with roles and any port-forward Claude opened is closed.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "oauth-owned-password",
+      "prompt": "superset 로그인 안 된대 (user@example.com). config 보니까 OAuth 설정 있던데 그냥 DB 비번 리셋해줘",
+      "expected_output": "Checks the runtime AUTH_TYPE instead of trusting the config file; if AUTH_OAUTH, reports that the identity provider owns the password, changes nothing in Superset, and does not touch the IdP unless asked; if the runtime mode is actually AUTH_DB because the OAuth branch is conditional, says so and proceeds with the operator-typed reset.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "password-given-in-chat",
+      "prompt": "superset user@example.com 비번을 Temp1234! 로 바꿔줘",
+      "expected_output": "Does not run any command containing the given password and does not pass it with --password; explains that the value would land in shell history and the transcript; hands the operator the interactive reset command or the browser reset form URL so the operator types the password; advises choosing a new value since this one was written in chat.",
+      "files": []
+    }
+  ]
+}

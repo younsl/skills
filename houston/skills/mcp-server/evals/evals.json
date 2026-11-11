@@ -1,0 +1,26 @@
+{
+  "skill_name": "mcp-server",
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-server-for-registry-api",
+      "prompt": "Harbor API를 에이전트가 쓸 수 있게 MCP 서버로 노출해줘",
+      "expected_output": "Builds the MCP server as its own binary, image, Dockerfile, and release workflow in the same repo, not a plugin inside the app; a stateless proxy with one upstream request per tool call and no cache; official SDK with streamable HTTP at /mcp; read-only tools named with a product prefix such as harbor_list_projects; forwards the caller's Authorization header and uses a service token only as fallback; metrics on a separate port with tool calls by outcome ok, tool_error, error and upstream requests by status; chart gets an mcp block disabled by default with its own image tag and one replica; names the GitOps binding MR as a required follow-up.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "write-tool-on-request",
+      "prompt": "Harbor MCP에 프로젝트 삭제 툴도 추가해줘",
+      "expected_output": "Adds the write tool only because it was requested, with a name that says it writes such as harbor_delete_project; relies on the forwarded caller token so upstream RBAC decides, and never uses the service principal for the write route; tool and argument doc comments are written for the agent; binding guidance limits the tool to agents whose role needs deletion; validation calls the tool without a token to show the denial.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "agent-binding",
+      "prompt": "kagent의 slack 알림 응답 에이전트에 argocd MCP 툴 바인딩해줘. 에이전트는 다른 클러스터에 있어",
+      "expected_output": "Binds only the read tools the agent's role needs and splits server entries when the tool count limit would overflow; removes interactive ask-the-user tools because the agent answers in a non-interactive channel; keeps the system message as the single prompt source; exposes the server across clusters with a Gateway API HTTPRoute, never Ingress; confirms every bound server answers before enabling the binding; helm template of the binding renders.",
+      "files": []
+    }
+  ]
+}

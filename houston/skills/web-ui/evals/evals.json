@@ -1,0 +1,26 @@
+{
+  "skill_name": "web-ui",
+  "evals": [
+    {
+      "id": 1,
+      "name": "drilldown-console",
+      "prompt": "환경별 DB 인스턴스 현황 화면 추가해줘. 인스턴스가 수백 개야",
+      "expected_output": "Builds one drill-down (overview, environment, instance, detail) with a breadcrumb and drill state in query params, not top tab bars or a long instance picker; minimal cards with monospace numbers and color only for state; metadata as icon and value chips; tsc, eslint, and production build pass; rebuilds and restarts the local instance against the live read-only API and gives the operator the URL and where to click; one screenshot per scenario for the MR.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "delete-confirmation",
+      "prompt": "삭제 버튼 누르면 확인창 뜨게 해줘",
+      "expected_output": "Uses the app's modal component, never window.confirm, alert, or prompt, and no title tooltips; renders a clear denied state for users without the permission; the grep for alert, confirm, prompt, and title= adds no hits in changed files; MR screenshots cover the modal, the done state, the failure state, and the denied state.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "resource-chart-panel",
+      "prompt": "파드 CPU, 메모리 사용량 차트 패널 추가해줘. request랑 limit도 보이게",
+      "expected_output": "Plots absolute units (cores, MiB or GiB) with one unit per axis and adaptive units only in tooltips; request is an amber dashed line and limit a red dashed line with no text on the lines, values in a legend below and in the tooltip; offsets the dash when request equals limit; the panel's own controls keep per-panel state in the URL with defaults omitted; new locale keys go into every locale file in existing order and help text has no colon.",
+      "files": []
+    }
+  ]
+}

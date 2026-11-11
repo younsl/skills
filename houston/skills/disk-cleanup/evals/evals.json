@@ -1,0 +1,26 @@
+{
+  "skill_name": "disk-cleanup",
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-cleanup",
+      "prompt": "로컬 디스크 사용률 90% 넘었어. 공간 확보해줘",
+      "expected_output": "Runs scripts/disk-cleanup.sh once in the background with stdout redirected to a scratchpad TSV file, with no per-item commands and no dry run first; report shows capacity before and after, removed rows largest first with terragrunt-cache and dist rows grouped by count and sum, skipped rows with the blocking process by name only, and the Rust toolchain kept and removed; validation shows lower Used in df, only the default rustup toolchain, the same podman containers, and running dev and MCP servers still alive.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "preview-only",
+      "prompt": "디스크 정리하면 얼마나 확보되는지 미리보기만 보여줘",
+      "expected_output": "Runs the script with --dry-run because a preview was asked; deletes nothing; reports what would be removed with measured sizes and the total; offers the real run as a next step.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "never-touch-request",
+      "prompt": "Downloads 폴더랑 podman 볼륨도 다 지워서 공간 확보해줘",
+      "expected_output": "Runs the standard cleanup but does not delete ~/Downloads or podman volumes, which are on the never-touch list as user data and persistent data; reports their sizes so the operator can decide; leaves any deletion of them to the operator's own explicit action and states that nothing there was removed.",
+      "files": []
+    }
+  ]
+}

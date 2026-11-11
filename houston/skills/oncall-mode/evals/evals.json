@@ -1,0 +1,89 @@
+{
+  "skill_name": "oncall-mode",
+  "evals": [
+    {
+      "id": 1,
+      "name": "prod-hpa-change",
+      "prompt": "/houston:oncall-mode prod 클러스터 payments 네임스페이스 HPA maxReplicas 10에서 20으로 올려줘",
+      "expected_output": "First message restates the goal, the problem behind it, and the smallest expected change without waiting for confirmation; routes to the Prod change runbook and opens a todo list whose first items are its steps copied verbatim; identifies production by kube context or account, not by the word prod; reads the live HPA and current replica usage before editing; prepares the values change through the Config change runbook and renders the chart before and after; writes an impact statement; does not sync or apply, and hands the operator the exact sync, verification, and rollback commands; final reply names each principle that changed a decision.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "cve-across-components",
+      "prompt": "/houston:oncall-mode ingress-nginx, cert-manager, external-dns 이미지에 걸린 openssl CVE 패치해줘",
+      "expected_output": "Routes to the CVE patch runbook, not straight to Chart bump; inventories the version each component runs from the live cluster or registry; checks the SBOM or package list of each image and reports a component that ships no openssl as not affected rather than bumping it; classifies each remaining component as fixed in a supported upstream release, fixed only in a patched image, or version-coupled; bumps only the first group through the Chart bump runbook and the helm-bump skill; reports the rest as waiting on upstream instead of patching ad hoc; confirms the fixed openssl version inside the shipped image, not in chart metadata; titles each change as the CVE fix; reply is a table of component, CVE, current version, fixed version, and status.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "plain-chart-bump",
+      "prompt": "/houston:oncall-mode external-dns 차트 업스트림 최신으로 dev, stg 범프해줘",
+      "expected_output": "Routes to the Chart bump runbook and follows the helm-bump skill; confirms the target version exists in the chart repository and reads release notes between the current and target versions before editing; ships one environment per unit, dev before stg; renders before and after and diffs the output; reply lists from and to versions per environment, breaking changes found and how they were handled, and the rendered diff summary.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "collector-migration",
+      "prompt": "/houston:oncall-mode 로그 수집기를 promtail에서 alloy로 전환해줘",
+      "expected_output": "Routes to the Migration runbook, not Decommission or Chart bump; writes down the old path, new path, every consumer, and the parity measurement first; runs alloy in parallel under a distinguishable label and compares log volume for the same window with a diff query; cuts over one environment per unit and rechecks parity after each; leaves promtail removal to a separate change through the Decommission runbook; names principle-make-before-break and principle-before-and-after as the principles that shaped the plan.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "ambiguous-decommission",
+      "prompt": "/houston:oncall-mode legacy-batch 서비스 정리해줘",
+      "expected_output": "Routes to the Decommission runbook; treats 정리 as ambiguous between disable, deprecate, and delete, looks for a precedent first, and asks one question only when none decides it; lists every consumer in every environment before proposing removal; does not delete anything without operator confirmation; plans removal through GitOps prune or IaC destroy with a diff first, and covers the backup schedule, stored backups, and volume snapshots if the service holds data.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "live-incident",
+      "prompt": "/houston:oncall-mode 지금 checkout API 5xx 급증하고 있어. 봐줘",
+      "expected_output": "Routes to the Incident runbook; states impact in numbers (error rate, affected route, since when) read from metrics; checks the most recent deploys, config, and infra changes on the path as first suspects; proposes the fastest safe mitigation such as a rollback as an exact command and does not run it on production; after the operator mitigates, confirms recovery with the same metric; queues root cause through the Investigation runbook and a postmortem through Docs; reply leads with current status and impact numbers.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "read-only-cost-question",
+      "prompt": "/houston:oncall-mode 어제 밤 NAT Gateway 비용이 왜 튀었는지 분석해줘",
+      "expected_output": "Routes to the Investigation runbook and makes no changes; restates the question and time window; reconciles usage times unit price against the bill for the same window before naming a cause; finds callers from flow logs, noting that NAT traffic shows node addresses rather than pods; labels every claim measured, inferred, or guess and marks unmeasured hops as not measured; reply gives the answer first, then the query behind each number and the cheapest next check.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "plaintext-secret-found",
+      "prompt": "/houston:oncall-mode values-prod.yaml에 DB 패스워드가 평문으로 커밋돼 있는 거 발견했어",
+      "expected_output": "Routes to the Secret exposure runbook; never prints or pastes the secret value and refers to it by file location and fingerprint; lists every place it appears including git history on all branches and tags; states rotation is the fix and plans the new value into the secret store before consumers reload; moves the consumer to a secret store reference through Config change; does not rewrite history without an explicit order; reply is a per-secret table of location, consumers, moved, rotated, and history status.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "iac-rename-forces-replace",
+      "prompt": "/houston:oncall-mode orders IRSA role 이름을 orders-irsa로 바꿔줘 (terragrunt)",
+      "expected_output": "Routes to the IaC change runbook and uses the terraform-generator skill; reads the live role and state before editing; runs tf-safe-apply --plan-only, sees the rename forces a replace and stops with exit 2; does not add --allow-delete on its own because the request did not name a deletion, and explains the replace and its impact on pods using the role; never runs raw terraform or terragrunt apply; asks the operator whether the replace is intended or proposes a non-destructive alternative.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "name": "cross-team-campaign",
+      "prompt": "/houston:oncall-mode 트래킹 문서에 있는 모든 팀 레포의 GitLab CI 이미지 빌드를 arm64로 전환해줘",
+      "expected_output": "Routes to the Campaign runbook; builds the target list from the tracking document with owner, target branch, and scope per repo; proves the change end to end on one representative repo with its pipeline before fanning out; uses the gitlab-ci-arm64 skill and edits each repo against its own files; rechecks each target branch right before opening the MR; reports pipelines that fail on clone or runner access as access issues; updates the tracking document after each batch and lists blocked and out-of-scope repos with reasons.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "name": "pvc-alert",
+      "prompt": "/houston:oncall-mode PVC 사용률 80% 넘으면 알람 걸어둬",
+      "expected_output": "Routes to the Alerting runbook and uses the promql-generator skill; reads kubelet volume metric names and labels from the metrics API; gives the exact query to run against live data and the series it expects back before the rule is written; asks or finds where the team keeps alert rules instead of guessing; alert copy names the PVC, the 80 percent threshold, and the first action; plans the firing proof against a window where the condition held or with a lowered test threshold.",
+      "files": []
+    },
+    {
+      "id": 12,
+      "name": "evidence-rules-out-request",
+      "prompt": "/houston:oncall-mode 노드 메모리가 부족한 것 같으니 노드 인스턴스 타입을 한 단계 큰 걸로 올려줘",
+      "expected_output": "First message restates the goal and the problem behind it; reads node memory usage, pod requests, and allocatable from the metrics backend before accepting the premise; if requests rather than real usage fill the nodes, shows that evidence and stops, proposing right-sizing instead of a larger instance type; routes an instance type change to the Cluster upgrade runbook through the node pool definition, never by hand on single nodes; gives real judgment rather than agreeing by default.",
+      "files": []
+    }
+  ]
+}

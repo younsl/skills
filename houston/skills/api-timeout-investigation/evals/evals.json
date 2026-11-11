@@ -1,0 +1,26 @@
+{
+  "skill_name": "api-timeout-investigation",
+  "evals": [
+    {
+      "id": 1,
+      "name": "caller-reported-timeout",
+      "prompt": "외부 파트너가 api.example.com/v1/orders 호출 시 어제 14시~15시 타임아웃 난다고 함. 조사해줘",
+      "expected_output": "Maps the request path hop by hop from DNS with each hop's timeout before analysis; computes count, p50, p90, p99, max, and count over caller timeout for every layer in the same window; separates CDN 000 with ClientCommError and LB 460 as client disconnects and derives the caller timeout from their time-taken clustering per client; compares other endpoints on the same LB and pods before blaming shared infrastructure; names the root cause only at the lowest time-aligned layer and cites code from the deployed image tag; all times KST with both window edges; layers without logs reported as not measured.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "gateway-suspicion",
+      "prompt": "게이트웨이 지연 때문인지 확인해줘. 다른 API는 괜찮대",
+      "expected_output": "Does not accept the gateway hypothesis from the description; shows per-bucket counts of client disconnects, LB processing time over the caller timeout, and app slow requests matching within a few percent before naming a layer; uses the fact that other endpoints on the same path are fast to rule out CDN, gateway, LB, node, and JVM-wide pauses with numbers; labels unconfirmed hypotheses as estimates with the check that would confirm them.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "confluence-report",
+      "prompt": "조사 결과 Confluence 인시던트 보고서로 정리해줘",
+      "expected_output": "Page opens with the toc macro, then sections 진행배경, TLDR, 측정 구간 아키텍처, 요약 정보, per-layer findings, 원인, 영향 평가, 권장 조치 with an owner per action, 분석 한계; includes the measurement architecture diagram with taps and verdict brackets and every required chart as 2x PNG with KST axes; uploads attachments right after creation and confirms they render before sharing the link; grep for Bearer and JWT-shaped strings returns nothing; follows writing-style.",
+      "files": []
+    }
+  ]
+}

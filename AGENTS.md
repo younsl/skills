@@ -19,6 +19,7 @@ Claude Code plugin marketplace. The `houston` plugin is an SRE skill stack: `onc
 - Principle skills set `disable-model-invocation: true` and are reached through oncall-mode
 - Skills are declarative: constraints and validation criteria, not procedures or boilerplate. Runbooks are the exception, because their step order is the content
 - Each SKILL.md stays under 500 lines with `name` matching its directory
+- oncall-mode and every domain skill ship `evals/evals.json` with unique ids and names, and `scripts/check.sh` fails when it is missing or malformed. Principle skills and the `dc` alias are exempt
 - A SKILL.md over 100 lines carries a `## Contents` index of its `##` and `###` headings right before the first section. `scripts/skill-toc.py` writes it, and `scripts/check.sh` fails when it is missing or out of sync, so rerun the script after adding, renaming, or removing a heading
 - Public repo: no company names, internal hosts, ticket keys, account IDs, private IPs, emails, or people. Examples use `example.com`, `10.0.0.0/16`, `123456789012`
 - Prose follows the writing-style skill: no em dash, no semicolons, links on keywords
