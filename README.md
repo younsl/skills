@@ -7,7 +7,7 @@ Claude Code skill stacks for SRE work, written in the [Agent Skills](https://age
 
 ## houston
 
-Houston, we have a task. [houston](houston) is an SRE skill stack modeled on [pstack](https://github.com/cursor/plugins/tree/main/pstack). One entry skill acks every task, triages it into a runbook, and lands it verified.
+Houston, we have a task. [houston](houston) is an SRE skill stack modeled on [pstack](https://github.com/cursor/plugins/tree/main/pstack). One entry skill acks every task, triages it into a runbook, and lands it verified. The [philosophy](houston/README.md#philosophy) and the [naming history](houston/README.md#naming) live in the plugin README.
 
 ```
 houston/
