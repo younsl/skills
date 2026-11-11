@@ -34,12 +34,42 @@ expect deny 'echo ok; TF_LOG=1 terraform apply'
 expect deny 'echo $(terraform apply)'
 expect deny '(cd a && terraform apply)'
 expect deny 'tf-safe-apply --plan-only && terraform apply'
+expect deny 'sudo -u ops terraform apply'
+expect deny 'time -p terraform apply'
+expect deny 'terraform "apply"'
+expect deny 'terraform \apply'
+expect deny 'terraform apply &'
+expect deny 'true & terraform apply'
+expect deny 'if true; then terraform apply; fi'
+expect deny '{ terraform apply; }'
+expect deny "$(printf 'terraform plan\nterraform apply')"
+expect deny 'terragrunt apply-all'
+expect deny 'bash -c "terraform apply"'
+expect deny 'TF_IN_AUTOMATION=1 /usr/local/bin/terraform apply'
+# shellcheck disable=SC2016
+expect ask 'eval "$CMD terraform"'
+expect ask 'watch terraform plan'
+expect ask 'terragrunt destroy-all'
+expect ask 'terraform apply -destroy=true'
+expect none 'echo terraform apply'
+expect none 'grep -r "terraform apply" docs'
 expect ask 'terraform destroy -target=aws_s3_bucket.x'
 expect ask 'terraform apply -destroy'
 expect ask 'terragrunt destroy'
 expect ask 'terraform state rm aws_s3_bucket.x'
 expect ask 'terraform import aws_s3_bucket.x bucket'
 expect ask 'tf-safe-apply --allow-delete aws_s3_bucket.x'
+
+nojq="$(mktemp -d)"
+trap 'rm -rf "$nojq"' EXIT
+for t in tr basename dirname; do
+  ln -s "$(command -v "$t")" "$nojq/$t"
+done
+got="$(printf '{"tool_input":{"command":"terraform apply"}}' | PATH="$nojq" "$BASH" "$guard")"
+if [[ "$got" != *'"permissionDecision":"ask"'* ]]; then
+  echo "FAIL without jq: want ask, got: ${got:-none}" >&2
+  fail=1
+fi
 
 if ((fail)); then
   exit 1

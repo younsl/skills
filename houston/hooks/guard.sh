@@ -2,64 +2,109 @@
 # PreToolUse guard for Bash commands. Reads the hook payload on stdin.
 set -euo pipefail
 
-command -v jq >/dev/null || exit 0
-cmd="$(jq -r '.tool_input.command // empty')"
-[[ -n "$cmd" ]] || exit 0
-
+payload="$(</dev/stdin)"
 root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 wrapper="$root/skills/terraform-generator/scripts/tf-safe-apply"
+tools='terraform|tofu|terragrunt'
+
+emit() {
+  local d="$1" r="${2//\"/\'}"
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"%s","permissionDecisionReason":"%s"}}\n' "$d" "$r"
+  exit 0
+}
+
+if ! command -v jq >/dev/null 2>&1; then
+  if [[ "$payload" =~ (^|[^a-z-])($tools)([^a-z-]|$) ]]; then
+    emit ask "houston guard cannot parse the command without jq. Confirm this Terraform-family command is safe."
+  fi
+  exit 0
+fi
+cmd="$(jq -r '.tool_input.command // empty' <<<"$payload")"
+[[ -n "$cmd" ]] || exit 0
 
 decision=""
 reason=""
 raise() {
   local level="$1" text="$2"
+  [[ "$decision" == deny ]] && return
   if [[ "$level" == deny || -z "$decision" ]]; then
-    [[ "$decision" == deny ]] && return
     decision="$level"
     reason="$text"
   fi
 }
 
+normalized="$(tr -d "'\"\\\\" <<<"$cmd")"
 nl=$'\n'
-segments="${cmd//&&/$nl}"
-segments="${segments//||/$nl}"
-segments="${segments//;/$nl}"
-segments="${segments//|/$nl}"
-segments="${segments//\$(/$nl}"
-segments="${segments//\`/$nl}"
-segments="${segments//)/ }"
+segments="$normalized"
+# shellcheck disable=SC2016
+for sep in '&&' '||' '$(' ';' '|' '&' '`' '(' ')' '{' '}' '<' '>'; do
+  segments="${segments//"$sep"/$nl}"
+done
+
+all_tokens=" $(tr -s '[:space:]' ' ' <<<"$normalized") "
+has_tool=false
+for token in $all_tokens; do
+  [[ "$(basename -- "$token")" =~ ^($tools)$ ]] && has_tool=true
+done
+
+check_tool() {
+  local bin="$1"
+  shift
+  local w destroy=false apply=false state=false
+  for w in "$@"; do
+    case "$w" in
+      destroy | destroy-all | -destroy | -destroy=true) destroy=true ;;
+      apply | apply-all) apply=true ;;
+      import | taint | untaint | force-unlock) state=true ;;
+    esac
+  done
+  [[ " $* " =~ \ state\ (rm|mv|push|replace-provider)\  ]] && state=true
+  if $destroy; then
+    raise ask "Terraform destroy removes resources. Confirm the destruction is intended and the target is correct."
+  elif $apply; then
+    raise deny "Raw $bin apply is blocked by houston. Run $wrapper instead: it applies only the saved plan, stops on any delete or replace not passed with --allow-delete, and verifies a clean plan after apply."
+  elif $state; then
+    raise ask "This $bin command changes state outside a reviewed plan. Confirm it is intended."
+  fi
+}
+
 while IFS= read -r segment; do
   read -r -a words <<<"$segment" || true
   ((${#words[@]})) || continue
-  i=0
-  while ((i < ${#words[@]})); do
-    case "${words[i]}" in
-      *=* | sudo | time | command | exec | env | nohup) ((i += 1)) ;;
+  first=0
+  while ((first < ${#words[@]})); do
+    case "${words[first]}" in
+      then | do | else | elif | if | while | until | !) ((first += 1)) ;;
       *) break ;;
     esac
   done
-  ((i < ${#words[@]})) || continue
-  bin="$(basename "${words[i]}")"
-  args=" ${words[*]:i+1} "
+  ((first < ${#words[@]})) || continue
+  case "$(basename -- "${words[first]}")" in
+    echo | printf | git | gh | glab | grep | rg | cat | sed | awk | jq | yq | curl | man | which | type | less | head | tail | wc | sort | diff | ls) continue ;;
+  esac
 
-  case "$bin" in
-    tf-safe-apply)
-      if [[ "$args" == *" --allow-delete "* ]]; then
-        raise ask "tf-safe-apply was given --allow-delete. Confirm each listed address is a deletion the request asked for."
-      fi
-      ;;
-    terraform | tofu | terragrunt)
-      if [[ "$args" == *" destroy "* || "$args" == *" -destroy "* ]]; then
-        raise ask "Terraform destroy removes resources. Confirm the destruction is intended and the target is correct."
-      elif [[ "$args" == *" apply "* ]]; then
-        raise deny "Raw $bin apply is blocked by houston. Run $wrapper instead: it applies only the saved plan, stops on any delete or replace not passed with --allow-delete, and verifies a clean plan after apply."
-      elif [[ "$args" =~ \ (import|taint|untaint|force-unlock)\  || "$args" =~ \ state\ (rm|mv|push|replace-provider)\  ]]; then
-        raise ask "This $bin command changes state outside a reviewed plan. Confirm it is intended."
+  before="$decision"
+  for ((j = first; j < ${#words[@]}; j++)); do
+    bin="$(basename -- "${words[j]}")"
+    if [[ "$bin" == tf-safe-apply ]]; then
+      for w in "${words[@]:j+1}"; do
+        [[ "$w" == --allow-delete* ]] && raise ask "tf-safe-apply was given --allow-delete. Confirm each listed address is a deletion the request asked for."
+      done
+      break
+    elif [[ "$bin" =~ ^($tools)$ ]]; then
+      check_tool "$bin" "${words[@]:j+1}"
+      break
+    fi
+  done
+
+  case "$(basename -- "${words[first]}")" in
+    eval | bash | sh | zsh | dash | xargs | parallel | watch | ssh | script | find | make | just | task)
+      if $has_tool && [[ "$decision" == "$before" ]]; then
+        raise ask "A Terraform-family command runs inside ${words[first]}, where houston guard cannot fully see its arguments. Confirm it is not a raw apply or destroy."
       fi
       ;;
   esac
 done <<<"$segments"
 
 [[ -n "$decision" ]] || exit 0
-jq -n --arg d "$decision" --arg r "$reason" \
-  '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: $d, permissionDecisionReason: $r}}'
+emit "$decision" "$reason"
