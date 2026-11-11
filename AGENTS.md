@@ -11,7 +11,7 @@ Claude Code plugin marketplace. The `houston` plugin is an SRE skill stack: `onc
 - `houston/agents/`: delegate subagents
 - `houston/hooks/`: `guard.sh` PreToolUse guard, wired in `hooks.json`
 - `houston/skills/<name>/scripts/`: executables a skill owns, such as `terraform-generator/scripts/tf-safe-apply`
-- `scripts/`: `check.sh` (validation), `test-guard.sh` (guard cases), `install.sh` (local link), `skill-toc.py` (Contents for long skills)
+- `scripts/`: `check.sh` (validation), `test-guard.sh` (guard cases), `install.sh` (local link), `skill-toc.py` (Contents for long skills), `eval-cases.py` (renders skill evals as `claude plugin eval` cases)
 
 ## Rules
 
