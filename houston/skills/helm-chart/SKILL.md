@@ -56,6 +56,7 @@ Standard chart practice applies without restating it. Below are the user's conve
 - Optional features follow the existing toggle idiom of the chart (e.g. `{{- if .Values.x.enabled }}`). CRD kinds also check `.Capabilities.APIVersions.Has "<group/version/Kind>"`
 - Reference blocks render every identifying field from the k8s-manifest table unconditionally, never behind `if`, even where existing chart templates do
 - Container field rules (`resizePolicy` after `resources`) come from k8s-manifest
+- Charts expose HTTP traffic through an `HTTPRoute` template, never an `Ingress` template. A chart that still ships `Ingress` gets `HTTPRoute` added and `Ingress` removed in the same change
 
 ## Review Output
 

@@ -35,6 +35,7 @@ Standard production practice (pinned tags, non-root `securityContext`, probes, `
 
 ## Services And Traffic
 
+- HTTP routing uses Gateway API `HTTPRoute` (`GRPCRoute` for gRPC) attached to the shared Gateway, never `Ingress`. Existing `Ingress` objects are migrated to `HTTPRoute`, not extended
 - Services set `trafficDistribution: PreferSameZone`, never the deprecated `PreferClose` alias. Backends spread across every zone with `topologySpreadConstraints` on `topology.kubernetes.io/zone`, and replicas (HPA `minReplicas` included) stay at or above the zone count, otherwise one zone falls back to cross-zone
 - Skip `PreferSameZone` when clients concentrate in one zone (no capacity spillover, that zone overloads) or when `internalTrafficPolicy: Local` already applies
 - gRPC Services with long-lived clients are balanced per request by an L7 proxy: Istio ambient waypoint (`istio.io/use-waypoint` label on the Service) and a DestinationRule with `loadBalancer.simple: LEAST_REQUEST` plus `outlierDetection`. ztunnel alone is L4 and pins every call on a connection to one pod

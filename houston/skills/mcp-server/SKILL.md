@@ -43,7 +43,7 @@ disable-model-invocation: false
 
 - An `mcp` block in the app chart, disabled by default, with its own image block whose tag does not default to the app version
 - MCP templates live in their own directory beside the app's templates
-- External exposure (ingress or gateway route) only when an agent in another cluster must reach the server
+- External exposure (a Gateway API `HTTPRoute`, never `Ingress`) only when an agent in another cluster must reach the server
 
 ## Agent Binding
 
