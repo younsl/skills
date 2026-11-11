@@ -2,6 +2,8 @@
 
 SRE skill stack for Claude Code. Start any engineering or operations task with `/houston:oncall-mode`. It restates the goal, triages the task into one of 15 runbooks, applies the principle skills each step cites, and hands back a verified result with its evidence.
 
+![houston architecture: every task enters through oncall-mode, runbooks set the order, principles set the rules](assets/architecture.svg)
+
 ## Philosophy
 
 Reliable operations come from verified changes, not fast ones. houston turns the habits of a careful on-call engineer into skills an agent loads on demand.
