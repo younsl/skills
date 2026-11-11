@@ -21,10 +21,12 @@ Standard chart practice applies without restating it. Below are the user's conve
 ## values.yaml
 
 - Every leaf key has a helm-docs annotation on the line above: `# -- (type) one short line`, no semicolon, even where neighbors use one. Never inline after the value, never multi-line. Parent maps follow the chart
+- Application config YAML outside charts (per-environment `config_<env>.yaml` and similar) uses the same `# -- (type)` annotation above each key
 - Comments beyond the annotation follow the global Code Comments rule
 - New knobs are a last resort: derive safety features (PDB, leader election) from existing values such as `replicaCount` or an enable flag
 - Do not add a `resources` key to components that lack one; absence means "follow upstream defaults"
 - Block sequences indented two spaces under their key; RBAC `apiGroups`, `resources`, `verbs` as `-` lines, never flow arrays
+- First-party charts expose `imagePullSecrets`, `serviceAccount.name`, and a `resizePolicy` value that defaults to empty
 
 ## Wrapper Charts
 

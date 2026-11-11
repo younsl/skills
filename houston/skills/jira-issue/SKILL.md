@@ -48,6 +48,7 @@ SP 1 equals one 8-hour workday. Use the SP the request names; otherwise estimate
 - Body sections, in order, as literal bracket headers: `[문제점 & 작업배경]`, `[작업 후 기대효과]`, `[작업 내용]`, `[결과]`
 - `[결과]` stays empty at creation; fill it only when asked or when closing, from the actual MR, commits, or measurements
 - Each section: single-level bullets, short sentences; no nested bullets
+- Comments follow the same single-level bullets, and bold text never wraps a code span (both render as raw text in comments)
 - Source material: the request text, current diff, MR, or pasted text; never invent numbers
 - Title and body prose follow writing-style, and never contain github.com URLs in title or body
 - Upper-case hyphen-number tokens that are not issue keys (`UTF-8`, `A2A-1`, `CVE-2025-1234`) are written as `utf-8`, `A2A1`, `cve-2025-1234` to avoid auto-linking

@@ -1,6 +1,6 @@
 ---
 name: principle-close-the-loop
-description: "Apply when after a push, a rebase, a destroy, a UI change, or a recommendation you made earlier in the thread. Finish every follow-through the change implies before reporting it."
+description: "Apply after a push, a rebase, a merge to a GitOps or deploy branch, a destroy, a UI change, or a recommendation you made earlier in the thread. Finish every follow-through the change implies before reporting it."
 disable-model-invocation: true
 ---
 
@@ -17,6 +17,7 @@ Finish every follow-through the change implies before reporting it.
 - A destroyed stack's code is deleted in the same flow.
 - Diff the deliverable against your own earlier recommendations. Each one is included or flagged before starting, not after.
 - Before reporting an MR as submitted, confirm it is mergeable. Rebase onto the default branch rather than merging it in.
+- A merged change is followed to the running system: the GitOps sync and prune state, the deploy pipeline's result, and the version the service reports.
 - Multi-repo features link every sibling MR from each MR body.
 - Docs, design notes, and inventories that describe the changed thing are updated in the same change.
 

@@ -28,6 +28,10 @@ for skill in houston/skills/*/; do
 done
 
 python3 scripts/skill-toc.py houston/skills/*/SKILL.md >/dev/null || err "skill-toc rewrote a Contents section, review and commit it"
+scripts/test-guard.sh >/dev/null || err "guard hook regression (run scripts/test-guard.sh)"
+if command -v shellcheck >/dev/null 2>&1; then
+  shellcheck scripts/*.sh houston/hooks/*.sh houston/skills/*/scripts/* || err "shellcheck failed"
+fi
 
 mode=houston/skills/oncall-mode
 refs="$(cat "$mode/SKILL.md" "$mode"/runbooks/*.md 2>/dev/null || true)"

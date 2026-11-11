@@ -34,7 +34,7 @@ Each trigger below names the principle or skill it applies. In the final reply, 
 - **Shared working tree, index, or state:** **principle-not-your-diff**.
 - **Before calling anything done:** **principle-proof-of-done** and the **done-check** skill.
 - **Commit, push, MR, or PR:** the Shipping runbook and the **git-ship** skill.
-- **Any prose** (reply, MR body, ticket, doc, alert copy): the **writing-style** skill and **principle-3am-reader**.
+- **Any prose** (reply, MR body, ticket, doc, alert copy): the **writing-style** skill and **principle-3am-reader**. Any image or deck: the **diagram** skill.
 - **Anything that leaves for a public repo:** **principle-air-gap**.
 
 ## Principles
@@ -88,18 +88,24 @@ Match the task to one runbook and open it at the listed file. Open a todo list w
 |---------|----------|------|
 | Investigation | Read-only question, root cause analysis, impact analysis, reproduction | `runbooks/investigation.md` |
 | Incident | Something is broken or degraded right now | `runbooks/incident.md` |
+| Secret exposure | A credential found in plain text in a repo, chart, log, or ticket | `runbooks/secret-exposure.md` |
 | Config change | Values, manifests, or policies across one or more environments | `runbooks/config-change.md` |
 | IaC change | Terraform or Terragrunt resources, IAM policies | `runbooks/iac-change.md` |
+| Onboarding | New service, job, or tool: infrastructure, GitOps app, DNS, exposure | `runbooks/onboarding.md` |
+| Access change | SSO clients, identity provider integrations, accounts, roles, access grants | `runbooks/access-change.md` |
 | Prod change | Production, freeze-period, or approval-gated change, production data fix | `runbooks/prod-change.md` |
 | Chart bump | Chart, app, or image version upgrade | `runbooks/chart-bump.md` |
+| Cluster upgrade | Kubernetes version, mesh or node agent data plane, node image or instance type across environments | `runbooks/cluster-upgrade.md` |
 | CVE patch | Fixing a reported vulnerability across components | `runbooks/cve-patch.md` |
 | Release | Cutting, re-releasing, or promoting a release of your own tool | `runbooks/release.md` |
 | Migration | Replacing a collector, architecture, registry, or version under live traffic | `runbooks/migration.md` |
+| Campaign | The same change across many repos or services that other teams own | `runbooks/campaign.md` |
 | Alerting | Alert rules, SLOs, dashboard panels | `runbooks/alerting.md` |
 | Right-sizing | Resource requests, limits, autoscaling, capacity | `runbooks/right-sizing.md` |
 | Decommission | Removing a service, stack, chart, or old version | `runbooks/decommission.md` |
 | Tool change | Feature, bug fix, or performance work in a tool or service codebase | `runbooks/tool-change.md` |
-| Docs | Guide, design doc, ticket, report, announcement | `runbooks/docs.md` |
+| Upstream contribution | Issue, fix, or feature for an open source project you do not own | `runbooks/upstream-contribution.md` |
+| Docs | Guide, design doc, ticket, report, announcement, diagram, deck | `runbooks/docs.md` |
 | Shipping | Commit, push, MR or PR. Invoked at the end of every runbook that ships | `runbooks/shipping.md` |
 
 No runbook fits: write a bespoke one in the todo list from the closest runbook's shape, and say so in the first message.
@@ -118,8 +124,11 @@ No runbook fits: write a bespoke one in the todo list from the closest runbook's
 | GitLab CI on arm64 | **gitlab-ci-arm64** |
 | Dockerfiles | **dockerfile-generator** |
 | Bash scripts | **bash-generator** |
+| Go services, CLIs, controllers | **go-generator** |
 | Rust services and CLIs | **rust-generator** |
 | Rust toolchain bump and re-release | **rust-bump-rerelease** |
+| Web consoles and portal pages | **web-ui** |
+| MCP servers and agent tool bindings | **mcp-server** |
 | Re-release at the same version | **release-retrigger** |
 | Post-release mirror and consumer bumps | **release-promote** |
 | Airflow DAGs | **airflow-dag-generator** |
@@ -129,6 +138,7 @@ No runbook fits: write a bespoke one in the todo list from the closest runbook's
 | Jira work items | **jira-issue** |
 | Commit, push, MR or PR | **git-ship** |
 | Verification gate before done | **done-check** |
+| Diagrams, infographics, chart images, decks | **diagram** |
 | Prose for humans | **writing-style** |
 
 ## Autonomy
@@ -137,6 +147,7 @@ No runbook fits: write a bespoke one in the todo list from the closest runbook's
 - **Always pause:** applies, deploys, writes to production or shared data, deletes, force-pushes to shared branches, and messages sent to people. Approval covers the task it was given for, not the next one.
 - **Explicit invocation:** a flow the operator explicitly invoked (a release, a re-release, a destroy order) runs end to end, cleanup included.
 - **No is an acceptable answer.** Asked whether to do something, give your real judgment. Agreement is not the default.
+- **Guard hook:** houston's PreToolUse hook enforces part of this list whether or not oncall-mode was invoked. A raw Terraform, OpenTofu, or Terragrunt `apply` is denied in favor of `tf-safe-apply`. `destroy`, state surgery, and `--allow-delete` ask the operator first. A denial is a signal to change approach, never something to work around.
 
 ## Subagents
 

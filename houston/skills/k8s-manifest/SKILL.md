@@ -28,6 +28,7 @@ Standard production practice (pinned tags, non-root `securityContext`, probes, `
 - Omit fields a controller owns: `spec.replicas` under HPA, KEDA, or Rollouts; resources under VPA. Otherwise add ArgoCD `ignoreDifferences`
 - `nodeAffinity.matchExpressions` and Karpenter NodePool `requirements` order: `kubernetes.io/os`, `kubernetes.io/arch`, worker selector (node kind label, `karpenter.sh/nodepool`), then zone or others; a worker label requested for a NodePool goes in both `template.metadata.labels` and `requirements`
 - Clusters mix amd64 and arm64 nodes; images must be multi-arch or the arch constraint explicit
+- `kubernetes.io/arch` moves to arm64 only when the deployed base tag's index lists arm64. A tag absent from the registry (placeholder or `latest`) leaves the value unchanged
 - `resizePolicy` right after `resources`: cpu `NotRequired`, memory `RestartContainer`
 - `preStop` sleep with matching `terminationGracePeriodSeconds`; `automountServiceAccountToken: false` unless the API is called; `dnsConfig.options.ndots: "2"` after testing
 - Under `ndots: "2"`, in-cluster names are `svc`, `svc.ns`, or the full `svc.ns.svc.cluster.local`, never `svc.ns.svc` (tried as absolute first and fails once). StatefulSet pod names such as `web-0.nginx.ns` use the full domain. Hot external names with one dot get a trailing dot (`example.com.`)
@@ -72,6 +73,7 @@ Verify with an empty `diff <(kubectl get <kind> <name> -n <ns> -o json | jq -S .
 ## Operations
 
 - Never use `kubectl port-forward` for verification; query in-cluster or read resources
+- Local app configs point at the service's existing external endpoint, never a port-forward address. A tunnel only for a service with no other reachable route
 - Never modify kubeconfig contexts; cluster-changing commands are handed to the user unless they asked Claude to apply
 
 ## Review Output

@@ -40,6 +40,8 @@ disable-model-invocation: false
 - TLS: rustls only (`rustls-tls` features), no `openssl-sys` or `native-tls` in `Cargo.lock`
 - Module style: sibling file pattern (`parent.rs` + `parent/`), never `mod.rs`
 - CRDs validate with schema bounds and CEL (`KubeSchema`, `x_kube(validation)`), defaults declared in the schema; no validating webhook
+- Operators and watchers use `kube::runtime`: `Controller` with `reconcile` and `error_policy`, reflector `Store`, `.owns()`, `Action::requeue`, server-side apply. No hand-rolled watch loops, and a `finalizer` only when ownerReferences cannot cover cleanup
+- Every HTTP endpoint has `#[utoipa::path]` and is registered in the `ApiDoc` `paths()` and `schemas`
 
 ## Project Structure (SRP)
 
@@ -133,6 +135,7 @@ Applies to crates that define a `#[derive(CustomResource)]` type. Priority order
 
 - done-check Rust gate passes (`cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`)
 - Glob `src/**/mod.rs` returns nothing
+- Every route on the axum router appears in the generated OpenAPI document
 - A second `cargo build -v` reports `Fresh` for the crate
 - `Cargo.lock` has no `openssl-sys` or `native-tls` package
 - Addons: `make zigbuild` produces both musl binaries

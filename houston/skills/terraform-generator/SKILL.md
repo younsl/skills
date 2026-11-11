@@ -47,6 +47,8 @@ General practice (pinned providers, variable validation, encryption at rest, lea
 ## Execution
 
 - Plan, apply, and destroy run only on explicit request; otherwise hand the exact command to the user
+- Applies run only through `scripts/tf-safe-apply` in this skill: it saves the plan, stops on any delete or replace whose address was not passed with `--allow-delete`, applies exactly that plan, and requires a clean plan afterwards. Never a raw `apply`, `-auto-approve`, or `destroy`
+- `--allow-delete` lists only addresses the request asked to remove. A stop on anything else is fixed in code or state, not allowed through
 - Removal work destroys first, then deletes the code, in that order
 
 ## Validation
@@ -55,3 +57,4 @@ General practice (pinned providers, variable validation, encryption at rest, lea
 - `terraform init -backend=false` then `terraform validate` in each touched root module
 - Terragrunt units use offline `terragrunt hcl validate`. Errors that an untouched sibling unit also reports come from `root.hcl` and are not new
 - `terragrunt validate` inits the real backend, so it needs credentials and is not an offline check
+- `tf-safe-apply --plan-only` exits 0 before any apply, and the post-apply plan reports no changes

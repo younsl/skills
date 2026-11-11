@@ -9,5 +9,6 @@ Values, manifests, or policies, often the same change across several environment
 5. Render every changed chart before and after with the API versions the cluster serves, and diff the output. State every resource that changes and why (**principle-before-and-after**).
 6. Policies roll out in warn or audit first, and deny only after the audit is clean.
 7. Ship one environment or branch per unit, finishing each before the next (**principle-reviewable-units**). Run Shipping.
+8. After merge, follow the change to the cluster. A GitOps app without automatic sync or prune keeps the old state. A resource kind switch or removal needs a prune sync, and a manual sync carries its sync options explicitly. Hand the sync to the operator on shared clusters, then confirm Synced and Healthy at the new revision (**principle-close-the-loop**).
 
 **Reply:** the change, the rendered diff per environment, live impact (restarts, rollouts, traffic), and what was left out.

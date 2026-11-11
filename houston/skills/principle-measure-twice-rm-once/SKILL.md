@@ -14,6 +14,7 @@ Make every irreversible step explicit, rehearsed, and approved before it runs.
 
 - Deletes are confirmed first, unless the request itself was the destructive instruction (a "destroy" order, a re-release flow the user invoked). Then the whole flow runs, cleanup included.
 - Plans run without taking locks or changing state. Any destroy or replace in a plan stops the apply and is reported.
+- Terraform applies run only on a saved plan that was checked for delete and replace actions, and only deletions the request named pass the check (the **terraform-generator** skill's `tf-safe-apply`). Never a raw apply.
 - Data changes run as rehearse (transaction then rollback), commit, verify, with a backup of touched rows and a check that the session is connected to the intended target.
 - Investigation resources (test nodes, debug pods) stay up until the user says to remove them.
 - Files copied into a remote container are checked (checksum) before they are executed.

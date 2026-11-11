@@ -42,10 +42,12 @@ disable-model-invocation: false
 
 ## Grafana Panels
 
-- Panel `description` in English
+- Every panel, header text panels included, has an English `description`
 - `byRegexp` override matchers wrapped in slashes: `/limit/`
 - One unit per axis; adaptive units only in tooltips
 - Legend-based overrides over `byFrameRefID` after aggregation
+- Thresholds use `thresholdsStyle.mode: dashed` and only the steps the request names, no extra warning step
+- CPU and memory panels in absolute units (cores, MiB, GiB), not percent of request. Request (amber) and limit (red) as dashed series without line labels, values in the legend and tooltip
 
 ## Collector Migration
 
@@ -55,3 +57,4 @@ Replacing an exporter or scraper ships in two MRs: parallel run under a temporar
 
 - `promtool check rules --lint=all` passes on the rule groups (`yq '.spec'` for PrometheusRule CRs)
 - Each new alert has a live query result, or a passing `promtool test rules` case and an unverified note in the response
+- `jq '[.. | objects | select(has("gridPos")) | select((.description // "") == "")] | length' <dashboard.json>` returns 0

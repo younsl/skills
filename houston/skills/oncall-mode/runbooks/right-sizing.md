@@ -7,5 +7,6 @@ Resource requests, limits, autoscaling, and capacity.
 3. Keep the file's existing order and placement conventions for resource blocks (**principle-no-snowflakes**).
 4. For peak events, size from the measured peak of the last comparable event, not a multiplier guess.
 5. Ship per environment (Config change runbook). After rollout, compare usage, throttling, and OOM kills for the same window length (**principle-before-and-after**).
+6. Managed datastores and stateful addon volumes (cache, search, streaming, metric and log storage) are sized from the provider's metrics per node and role, with percentiles rather than single-request maxima, and with the coarser resolution older windows keep in mind. Project storage growth to the retention period before choosing a size.
 
 **Reply:** a table of component, old and new requests and limits, the usage numbers behind them, and the post-rollout comparison.

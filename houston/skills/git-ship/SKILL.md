@@ -34,6 +34,8 @@ Turn a one-line ship request into commit, push, and MR/PR with no follow-up ques
 - Repo rules win: read the repo `AGENTS.md`/`CLAUDE.md` and project memory for branch policy (direct push vs MR) and commit format before anything else
 - The commit holds only the current task's paths regardless of what is already in the index (pathspec commit, `--amend --only`), so other sessions' staged files stay staged; never `git add -A`, never sweep unrelated changes or other people's edits
 - Commit format: repo convention, else Conventional Commits `type(scope): subject`; subject language matches recent `git log`
+- A convention that puts a ticket key in the subject applies to every commit, docs commits included
+- Public OSS commit bodies are plain English full sentences covering the problem, the change, and the effect on users
 - Commit wording distinguishes a fix for something missing from a new addition
 - No `Co-Authored-By`, Claude session trailers, or tool attribution in commits or MR bodies
 - Branch name: `<type>/<short-kebab-topic>` (`feat/`, `fix/`, `chore/`, `docs/`, `refactor/`, `bump/`)
@@ -48,6 +50,10 @@ Turn a one-line ship request into commit, push, and MR/PR with no follow-up ques
 - Title: conventional prefix kept, rest in the language of recent MR titles (Korean for internal GitLab repos)
 - Sections in order for internal GitLab MRs: `## 진행배경`, `## 변경사항`, `## 기타사항`. GitHub PRs on public repos use the repo PR template, else `## Background`, `## Changes`, `## Notes`. Add `## 테스트 결과` only for substantial verification output, `## 로드맵` only for future plans
 - Each section 1 to 3 bullets; why over what; no file-by-file or permission-by-permission listing
+- Improvement or hardening MRs use `## 개선사항` (`## Improvements` on public PRs) in place of the changes section, each bullet `- topic: description`, and the commit body bullets use the same form
+- Refactor MRs put the change bullets and the main versus branch result table in two separate `<details>` blocks under the changes section
+- UI MRs embed one screenshot per scenario (trigger, in progress, done, failure) from the entry point users actually use, every entry point of a shared component, and the denied view of permission-gated UI
+- Public OSS PRs link claims about repo code to commit-SHA permalinks with line anchors. When the contribution guide asks for an issue first, the issue exists before the PR
 - If the user states context in the request ("~하는 작업이야", "기타사항에 ~ 언급"), it goes verbatim in meaning into 진행배경 or 기타사항
 - Follow-up MR spawned by another MR: 진행배경 opens with that MR's link and why it ships now
 - `writing-style` rules apply

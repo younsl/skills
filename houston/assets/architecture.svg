@@ -1,13 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="760" viewBox="0 0 960 760" role="img" aria-labelledby="t d">
   <title id="t">One door in, runbooks set the order, principles set the rules</title>
-  <desc id="d">houston architecture. Every task enters through the oncall-mode entry skill, which acks it, triages it into one of 15 runbooks, and delegates scoped work to the flight-controller subagent. Each runbook step cites principle skills (24, in five groups) and uses domain skills (22, in four groups). The run ends in a verified result with evidence, and applies, deploys, production writes, and deletes wait for the operator.</desc>
+  <desc id="d">houston architecture. Every task enters through the oncall-mode entry skill, which acks it, triages it into one of 21 runbooks, and delegates scoped work to the flight-controller subagent. Each runbook step cites principle skills (24, in five groups) and uses domain skills (26, in five groups). A guard hook blocks raw Terraform applies in favor of a checked saved plan and asks before destroys. The run ends in a verified result with evidence, and applies, deploys, production writes, and deletes wait for the operator.</desc>
   <style>
     .sans { font-family: Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif; }
     .mono { font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .title { font-size: 20px; font-weight: 600; fill: #ededed; letter-spacing: -0.02em; }
     .sub { font-size: 13px; fill: #a1a1a1; }
     .label { font-size: 10px; fill: #8f8f8f; letter-spacing: 0.08em; }
-    .head { font-size: 14px; font-weight: 600; fill: #ededed; }
     .body { font-size: 12.5px; fill: #ededed; }
     .dim { font-size: 12px; fill: #8f8f8f; }
     .code { font-size: 12px; fill: #ededed; }
@@ -22,8 +21,8 @@
     </marker>
   </defs>
 
-  <rect width="960" height="720" rx="12" fill="#000"/>
-  <rect x="0.5" y="0.5" width="959" height="719" rx="11.5" fill="none" stroke="#2e2e2e"/>
+  <rect width="960" height="760" rx="12" fill="#000"/>
+  <rect x="0.5" y="0.5" width="959" height="759" rx="11.5" fill="none" stroke="#2e2e2e"/>
 
   <text x="40" y="50" class="sans title">One door in, runbooks set the order, principles set the rules</text>
   <text x="40" y="74" class="sans sub">houston routes every SRE task through oncall-mode and lands it with evidence.</text>
@@ -51,36 +50,47 @@
   <text x="56" y="474" class="mono code">flight-controller</text>
   <text x="56" y="496" class="sans dim">subagent for scoped work</text>
 
+  <text x="40" y="550" class="mono label">ALWAYS ON</text>
+  <rect x="40" y="560" width="200" height="66" rx="8" fill="none" stroke="#4d4d4d" stroke-dasharray="4 4"/>
+  <text x="56" y="586" class="mono code">guard hook</text>
+  <text x="56" y="608" class="sans dim">raw terraform apply blocked</text>
+
   <!-- column 2: runbooks -->
   <line x1="240" y1="310" x2="278" y2="310" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
 
-  <text x="282" y="112" class="mono label">RUNBOOKS  15</text>
-  <rect x="282" y="122" width="248" height="476" rx="8" fill="none" stroke="#2e2e2e"/>
+  <text x="282" y="112" class="mono label">RUNBOOKS  21</text>
+  <rect x="282" y="122" width="248" height="504" rx="8" fill="none" stroke="#2e2e2e"/>
   <g class="sans body">
-    <text x="300" y="154">Investigation</text>
-    <text x="300" y="180">Incident</text>
-    <text x="300" y="206">Config change</text>
-    <text x="300" y="232">IaC change</text>
-    <text x="300" y="258">Prod change</text>
-    <text x="300" y="284">Chart bump</text>
-    <text x="300" y="310">CVE patch</text>
-    <text x="300" y="336">Release</text>
-    <text x="300" y="362">Migration</text>
-    <text x="300" y="388">Alerting</text>
-    <text x="300" y="414">Right-sizing</text>
-    <text x="300" y="440">Decommission</text>
-    <text x="300" y="466">Tool change</text>
-    <text x="300" y="492">Docs</text>
+    <text x="300" y="150">Investigation</text>
+    <text x="300" y="171">Incident</text>
+    <text x="300" y="192">Secret exposure</text>
+    <text x="300" y="213">Config change</text>
+    <text x="300" y="234">IaC change</text>
+    <text x="300" y="255">Onboarding</text>
+    <text x="300" y="276">Access change</text>
+    <text x="300" y="297">Prod change</text>
+    <text x="300" y="318">Chart bump</text>
+    <text x="300" y="339">Cluster upgrade</text>
+    <text x="300" y="360">CVE patch</text>
+    <text x="300" y="381">Release</text>
+    <text x="300" y="402">Migration</text>
+    <text x="300" y="423">Campaign</text>
+    <text x="300" y="444">Alerting</text>
+    <text x="300" y="465">Right-sizing</text>
+    <text x="300" y="486">Decommission</text>
+    <text x="300" y="507">Tool change</text>
+    <text x="300" y="528">Upstream contribution</text>
+    <text x="300" y="549">Docs</text>
   </g>
-  <line x1="300" y1="512" x2="512" y2="512" stroke="#2e2e2e"/>
-  <text x="300" y="540" class="sans body">Shipping</text>
-  <text x="300" y="562" class="sans dim">closes every runbook that ships</text>
+  <line x1="300" y1="566" x2="512" y2="566" stroke="#2e2e2e"/>
+  <text x="300" y="590" class="sans body">Shipping</text>
+  <text x="300" y="610" class="sans dim">closes every runbook that ships</text>
 
   <!-- column 3: principles and domain skills -->
   <line x1="530" y1="232" x2="568" y2="232" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
   <text x="536" y="222" class="mono edge">CITES</text>
-  <line x1="530" y1="480" x2="568" y2="480" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
-  <text x="536" y="470" class="mono edge">USES</text>
+  <line x1="530" y1="500" x2="568" y2="500" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="536" y="490" class="mono edge">USES</text>
 
   <text x="572" y="112" class="mono label">PRINCIPLES  24</text>
   <rect x="572" y="122" width="348" height="232" rx="8" fill="none" stroke="#2e2e2e"/>
@@ -97,8 +107,8 @@
     <text x="590" y="344" class="body">3am-reader, air-gap +1</text>
   </g>
 
-  <text x="572" y="384" class="mono label">DOMAIN SKILLS  22</text>
-  <rect x="572" y="394" width="348" height="204" rx="8" fill="none" stroke="#2e2e2e"/>
+  <text x="572" y="384" class="mono label">DOMAIN SKILLS  26</text>
+  <rect x="572" y="394" width="348" height="232" rx="8" fill="none" stroke="#2e2e2e"/>
   <g class="sans">
     <text x="590" y="422" class="mono label">KUBERNETES  4</text>
     <text x="590" y="440" class="body">helm-chart, k8s-manifest +2</text>
@@ -106,14 +116,16 @@
     <text x="590" y="484" class="body">terraform-generator, gitlab-ci-arm64 +2</text>
     <text x="590" y="510" class="mono label">OBSERVABILITY  2</text>
     <text x="590" y="528" class="body">promql-generator, api-timeout-investigation</text>
-    <text x="590" y="554" class="mono label">CODE, RELEASE, WORKFLOW  12</text>
-    <text x="590" y="572" class="body">rust-generator, git-ship, done-check +9</text>
+    <text x="590" y="554" class="mono label">CODE  6</text>
+    <text x="590" y="572" class="body">go-generator, rust-generator, web-ui +3</text>
+    <text x="590" y="598" class="mono label">RELEASE AND WORKFLOW  10</text>
+    <text x="590" y="616" class="body">git-ship, done-check, diagram +7</text>
   </g>
 
   <!-- output -->
-  <line x1="406" y1="598" x2="406" y2="634" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
-  <rect x="40" y="638" width="480" height="48" rx="8" fill="#141414" stroke="#ededed"/>
-  <text x="58" y="667" class="sans body">Verified result, with the evidence for every claim</text>
-  <rect x="540" y="638" width="380" height="48" rx="8" fill="none" stroke="#4d4d4d" stroke-dasharray="4 4"/>
-  <text x="558" y="667" class="sans dim">Applies, deploys, prod writes, deletes wait for the operator</text>
+  <line x1="406" y1="626" x2="406" y2="662" stroke="#ededed" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="40" y="666" width="480" height="48" rx="8" fill="#141414" stroke="#ededed"/>
+  <text x="58" y="695" class="sans body">Verified result, with the evidence for every claim</text>
+  <rect x="540" y="666" width="380" height="48" rx="8" fill="none" stroke="#4d4d4d" stroke-dasharray="4 4"/>
+  <text x="558" y="695" class="sans dim">Applies, deploys, prod writes, deletes wait for the operator</text>
 </svg>

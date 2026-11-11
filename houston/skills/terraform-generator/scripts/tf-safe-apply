@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# Usage: tf-safe-apply [--tool terraform|terragrunt|tofu] [--allow-delete ADDRESS]... [--plan-only] [-- PLAN_ARGS...]
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Plan, check, and apply exactly the saved plan in the current directory.
+
+Stops before apply when the plan deletes or replaces any resource whose
+address was not passed with --allow-delete. After apply, a fresh plan must
+report no changes.
+
+  --tool NAME            terraform, terragrunt, or tofu (default: terragrunt
+                         when terragrunt.hcl exists, else terraform, else tofu)
+  --allow-delete ADDR    resource address whose delete or replace is intended,
+                         repeatable
+  --plan-only            stop after the plan check
+  -- PLAN_ARGS           extra arguments for plan (for example -target=ADDR)
+
+Exit codes: 0 applied or plan clean, 2 unintended delete or replace,
+3 post-apply plan not empty, other values come from the tool.
+EOF
+}
+
+tool=""
+plan_only=false
+allowed=()
+plan_args=()
+while (($#)); do
+  case "$1" in
+    --tool) tool="$2"; shift 2 ;;
+    --allow-delete) allowed+=("$2"); shift 2 ;;
+    --plan-only) plan_only=true; shift ;;
+    -h | --help) usage; exit 0 ;;
+    --) shift; plan_args=("$@"); break ;;
+    *) echo "error: unknown argument $1" >&2; usage >&2; exit 64 ;;
+  esac
+done
+
+if [[ -z "$tool" ]]; then
+  if [[ -f terragrunt.hcl ]] && command -v terragrunt >/dev/null; then
+    tool=terragrunt
+  elif command -v terraform >/dev/null; then
+    tool=terraform
+  else
+    tool=tofu
+  fi
+fi
+command -v "$tool" >/dev/null || { echo "error: $tool not found" >&2; exit 127; }
+command -v jq >/dev/null || { echo "error: jq not found" >&2; exit 127; }
+
+plan_file="$PWD/.houston-$$.tfplan"
+trap 'rm -f "$plan_file"' EXIT
+
+echo "[plan] $tool plan -input=false -out=$plan_file ${plan_args[*]:-}"
+"$tool" plan -input=false -out="$plan_file" ${plan_args[@]+"${plan_args[@]}"}
+
+changes="$("$tool" show -json "$plan_file" | jq -c '[.resource_changes[]? | select(.change.actions != ["no-op"] and .change.actions != ["read"]) | {address, actions: .change.actions}]')"
+destructive="$(jq -r '.[] | select(.actions | index("delete")) | .address' <<<"$changes")"
+
+echo "[check] $(jq -r 'map(.actions | join("+")) | group_by(.) | map("\(length) \(.[0])") | join(", ") | if . == "" then "no changes" else . end' <<<"$changes")"
+
+unintended=()
+while IFS= read -r address; do
+  [[ -z "$address" ]] && continue
+  intended=false
+  for a in "${allowed[@]:-}"; do
+    [[ "$a" == "$address" ]] && intended=true
+  done
+  if $intended; then
+    echo "[check] intended delete or replace: $address"
+  else
+    unintended+=("$address")
+  fi
+done <<<"$destructive"
+
+if ((${#unintended[@]})); then
+  echo "[stop] plan deletes or replaces resources that were not declared intended:" >&2
+  printf '  %s\n' "${unintended[@]}" >&2
+  echo "Fix the code, or rerun with --allow-delete for each address the request actually asked to remove." >&2
+  exit 2
+fi
+
+if $plan_only; then
+  echo "[done] plan is non-destructive, apply skipped (--plan-only)"
+  exit 0
+fi
+if [[ "$(jq 'length' <<<"$changes")" == 0 ]]; then
+  echo "[done] no changes, nothing to apply"
+  exit 0
+fi
+
+echo "[apply] $tool apply -input=false $plan_file"
+"$tool" apply -input=false "$plan_file"
+
+echo "[verify] post-apply plan"
+set +e
+"$tool" plan -input=false -detailed-exitcode ${plan_args[@]+"${plan_args[@]}"} >/dev/null
+code=$?
+set -e
+case "$code" in
+  0) echo "[done] applied, post-apply plan reports no changes" ;;
+  2) echo "[warn] post-apply plan still reports changes, investigate drift" >&2; exit 3 ;;
+  *) echo "[error] post-apply plan failed with exit $code" >&2; exit "$code" ;;
+esac

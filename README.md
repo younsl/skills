@@ -16,14 +16,17 @@ houston/
 ├── skills/
 │   ├── oncall-mode/          entry skill and its runbooks/
 │   ├── principle-*/          24 engineering principles
-│   └── <domain skills>/      helm-chart, k8s-manifest, terraform-generator, ...
-└── agents/
-    └── flight-controller.md  delegate subagent used inside a runbook
+│   └── <domain skills>/      26 skills: helm-chart, k8s-manifest, terraform-generator, go-generator, ...
+├── agents/
+│   └── flight-controller.md  delegate subagent used inside a runbook
+└── hooks/
+    └── guard.sh              PreToolUse guard, active whenever the plugin is installed
 ```
 
-- **oncall-mode** restates the goal, picks one of 15 runbooks (Investigation, Incident, Config change, IaC change, Prod change, Chart bump, CVE patch, Release, Migration, Alerting, Right-sizing, Decommission, Tool change, Docs, Shipping), and copies its steps into a todo list.
+- **oncall-mode** restates the goal, picks one of 21 runbooks, and copies its steps into a todo list. Runbooks cover investigation, incidents, secret exposure, config, IaC, onboarding, access, production changes, chart bumps, cluster upgrades, CVE patches, releases, migrations, campaigns across teams, alerting, right-sizing, decommissioning, tool changes, upstream contributions, docs, and shipping.
 - **principle-\*** skills carry the rules each runbook step cites, such as `principle-trust-but-curl` (check every fact against the live system), `principle-no-friday-deploys` (production is the operator's button), and `principle-its-always-dns` (measure each layer instead of guessing).
-- **Domain skills** hold the conventions for one file type or tool, such as Helm charts, Terraform, PromQL, Dockerfiles, and Rust.
+- **Domain skills** hold the conventions for one file type or tool, such as Helm charts, Kubernetes manifests, Terraform, PromQL, Go, Rust, web UIs, MCP servers, CI, Dockerfiles, and diagrams.
+- **The guard hook** enforces what must not depend on the model remembering a rule. A raw Terraform, OpenTofu, or Terragrunt `apply` is denied in favor of `tf-safe-apply`, which applies only a saved plan, stops on any delete or replace the request did not name, and requires a clean plan afterwards. `destroy` and state surgery ask the operator first.
 
 ## Install
 
@@ -48,7 +51,7 @@ Then run `/reload-plugins` and start a task with `/houston:oncall-mode`. Domain 
 $ scripts/check.sh
 ```
 
-The check validates the marketplace and plugin manifests, the frontmatter and size of every skill, that every principle skill starts with `principle-` and is listed in oncall-mode, that every runbook and principle oncall-mode references exists, and that no email address, AWS account ID, or private IP outside the example ranges is committed.
+The check validates the marketplace and plugin manifests, the frontmatter and size of every skill, that every principle skill starts with `principle-` and is listed in oncall-mode, that every runbook and principle oncall-mode references exists, the guard hook's allow, ask, and deny cases (`scripts/test-guard.sh`), shellcheck on every script, and that no email address, AWS account ID, or private IP outside the example ranges is committed.
 
 ## License
 

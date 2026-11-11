@@ -1,6 +1,6 @@
 # houston
 
-SRE skill stack for Claude Code. Start any engineering or operations task with `/houston:oncall-mode`. It restates the goal, triages the task into one of 15 runbooks, applies the principle skills each step cites, and hands back a verified result with its evidence.
+SRE skill stack for Claude Code. Start any engineering or operations task with `/houston:oncall-mode`. It restates the goal, triages the task into one of 21 runbooks, applies the principle skills each step cites, and hands back a verified result with its evidence.
 
 ![houston architecture: every task enters through oncall-mode, runbooks set the order, principles set the rules](assets/architecture.svg)
 
@@ -41,7 +41,8 @@ Names considered on the way there:
 
 - `skills/oncall-mode/`: the entry skill and its `runbooks/`.
 - `skills/principle-*/`: engineering principles such as trust-but-curl, proof-of-done, blast-radius, and no-friday-deploys.
-- `skills/<name>/`: domain skills for Helm, Kubernetes manifests, Terraform, PromQL, Falco, CI, Dockerfiles, Bash, Rust, releases, Jira, and writing.
+- `skills/<name>/`: domain skills for Helm, Kubernetes manifests, Terraform, PromQL, Falco, CI, Dockerfiles, Bash, Go, Rust, web UIs, MCP servers, releases, Jira, diagrams, and writing.
 - `agents/flight-controller.md`: the delegate subagent oncall-mode spawns inside a runbook step.
+- `hooks/guard.sh`: a PreToolUse guard that is active whenever the plugin is installed, with or without oncall-mode.
 
-Production writes, applies, deletes, and messages to people always pause for the operator. See the [repository README](https://github.com/younsl/skills) for development and checks.
+Production writes, applies, deletes, and messages to people always pause for the operator. Terraform is enforced, not just advised: a raw `apply` is denied, and `skills/terraform-generator/scripts/tf-safe-apply` applies only a saved plan that has no delete or replace beyond the addresses the request named, then requires a clean plan. See the [repository README](https://github.com/younsl/skills) for development and checks.
