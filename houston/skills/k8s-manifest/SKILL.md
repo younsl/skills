@@ -41,6 +41,14 @@ Standard production practice (pinned tags, non-root `securityContext`, probes, `
 - gRPC Services with long-lived clients are balanced per request by an L7 proxy: Istio ambient waypoint (`istio.io/use-waypoint` label on the Service) and a DestinationRule with `loadBalancer.simple: LEAST_REQUEST` plus `outlierDetection`. ztunnel alone is L4 and pins every call on a connection to one pod
 - Judge gRPC balancing by server-side p99 per pod, not by even request counts. No proxy is needed when clients use gRPC `round_robin` against a headless Service
 
+## Metrics Scraping
+
+- Metrics are served on a dedicated container port named `metrics`, separate from the traffic port named `http`. A ServiceMonitor never scrapes the traffic port, even when the app serves `/metrics` there
+- The Service declares both named ports, and the ServiceMonitor selects `endpoints[].port: metrics` by name, never by number
+- The metrics port is never an `HTTPRoute` backendRef or reachable from the edge. Network rules (security group, NetworkPolicy) open it to the metrics collector only
+- Only the stable Service carries the metrics port. Canary and preview Services leave it out, otherwise the same pods are scraped twice
+- `interval` and `scrapeTimeout` are written explicitly, with `scrapeTimeout` not above `interval`
+
 ## CRDs With Server-Side Defaults
 
 Write CRD default fields explicitly so ArgoCD does not show permanent drift.
@@ -85,3 +93,4 @@ Errors, then warnings, one line each with `file:line` and the fix; then validati
 
 - `kubeconform -strict -summary -schema-location default -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'` passes
 - `kubectl apply --dry-run=server` passes where cluster access exists
+- A scraped workload's rendered Service has distinct `http` and `metrics` ports, its ServiceMonitor references `metrics`, and the target shows `up == 1` in the metrics backend after rollout

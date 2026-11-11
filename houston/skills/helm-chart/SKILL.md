@@ -57,6 +57,7 @@ Standard chart practice applies without restating it. Below are the user's conve
 - Reference blocks render every identifying field from the k8s-manifest table unconditionally, never behind `if`, even where existing chart templates do
 - Container field rules (`resizePolicy` after `resources`) come from k8s-manifest
 - Charts expose HTTP traffic through an `HTTPRoute` template, never an `Ingress` template. A chart that still ships `Ingress` gets `HTTPRoute` added and `Ingress` removed in the same change
+- Metrics follow the k8s-manifest Metrics Scraping rules: a `metrics` container and Service port separate from `http`, and a `ServiceMonitor` template gated on the metrics toggle and the `monitoring.coreos.com/v1/ServiceMonitor` capability, off by default
 
 ## Review Output
 
