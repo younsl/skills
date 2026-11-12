@@ -1,6 +1,6 @@
 # houston
 
-SRE skill stack for Claude Code. Start any engineering or operations task with `/houston:oncall-mode`. It restates the goal, triages the task into one of 21 runbooks, applies the principle skills each step cites, and hands back a verified result with its evidence.
+[SRE](https://sre.google/) [skill](https://code.claude.com/docs/en/skills) stack for [Claude Code](https://code.claude.com/docs/en/overview). Start any engineering or operations task with `/houston:oncall-mode`. It restates the goal, triages the task into one of 21 runbooks, applies the principle skills each step cites, and hands back a verified result with its evidence.
 
 ![houston architecture: every task enters through oncall-mode, runbooks set the order, principles set the rules](assets/architecture.svg)
 
@@ -20,7 +20,7 @@ The principles were distilled from a few hundred review corrections and working 
 
 ## Naming
 
-houston is named after mission control. "Houston, we have a problem" is the call made when something goes wrong, and mission control already does what SRE does: launches (releases), telemetry (observability), anomaly response (incidents), resource management (capacity), and procedures (runbooks). The entry skill is `oncall-mode` because it acks and triages like an on-call engineer, and its delegate subagent is the `flight-controller`.
+houston is named after mission control. ["Houston, we have a problem"](https://www.nasa.gov/mission/apollo-13/) is the call made when something goes wrong, and mission control already does what SRE does: launches (releases), telemetry (observability), anomaly response (incidents), resource management (capacity), and procedures (runbooks). The entry skill is `oncall-mode` because it acks and triages like an on-call engineer, and its delegate [subagent](https://code.claude.com/docs/en/sub-agents) is the `flight-controller`.
 
 Names considered on the way there:
 
@@ -41,8 +41,8 @@ Names considered on the way there:
 
 - `skills/oncall-mode/`: the entry skill and its `runbooks/`.
 - `skills/principle-*/`: engineering principles such as trust-but-curl, proof-of-done, blast-radius, and no-friday-deploys.
-- `skills/<name>/`: domain skills for Helm, Kubernetes manifests, Terraform, PromQL, Falco, CI, Dockerfiles, Bash, Go, Rust, web UIs, MCP servers, releases, Jira, diagrams, and writing.
+- `skills/<name>/`: domain skills for [Helm](https://helm.sh/), [Kubernetes](https://kubernetes.io/) manifests, [Terraform](https://developer.hashicorp.com/terraform), [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/), [Falco](https://falco.org/), CI, [Dockerfiles](https://docs.docker.com/reference/dockerfile/), [Bash](https://www.gnu.org/software/bash/), [Go](https://go.dev/), [Rust](https://www.rust-lang.org/), web UIs, [MCP](https://modelcontextprotocol.io/) servers, releases, [Jira](https://www.atlassian.com/software/jira), diagrams, and writing.
 - `agents/flight-controller.md`: the delegate subagent oncall-mode spawns inside a runbook step.
-- `hooks/guard.sh`: a PreToolUse guard that is active whenever the plugin is installed, with or without oncall-mode.
+- `hooks/guard.sh`: a [PreToolUse](https://code.claude.com/docs/en/hooks#pretooluse) guard that is active whenever the plugin is installed, with or without oncall-mode.
 
 Production writes, applies, deletes, and messages to people always pause for the operator. Terraform is enforced, not just advised: a raw `apply` is denied, and `skills/terraform-generator/scripts/tf-safe-apply` applies only a saved plan that has no delete or replace beyond the addresses the request named, then requires a clean plan. See the [repository README](https://github.com/younsl/skills) for development and checks.
