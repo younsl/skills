@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "houston",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "SRE skill stack. oncall-mode triages every task into a runbook and applies verification-first principles across Kubernetes, Helm, Terraform, observability, releases, and incidents.",
   "author": {
     "name": "younsl"

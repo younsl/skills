@@ -6,7 +6,7 @@ argument-hint: "[project purpose]"
 license: Apache-2.0
 compatibility: cargo with rustfmt and clippy, plus cargo-zigbuild, zig 0.15.2, and the x86_64 and aarch64 musl targets for addon packaging
 metadata:
-  version: "1.6.0"
+  version: "1.6.1"
   category: generator
   related: dockerfile-generator helm-chart github-actions-generator done-check rust-bump-rerelease
 allowed-tools: Bash(cargo *) Bash(rustc --version) Read Write Edit Grep Glob
@@ -77,7 +77,7 @@ src/
 
 ## Workspace
 
-A component that ships several crates released together (two binaries over a shared library, such as an operator and its node agent) is one [Cargo workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html). A component with one crate stays standalone, and a repository never gets a root workspace across unrelated components.
+A component that ships several crates (two binaries over a shared library, such as an operator and its node agent) is one [Cargo workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html). A component with one crate stays standalone, and a repository never gets a root workspace across unrelated components.
 
 ```
 <component>/
@@ -95,7 +95,9 @@ A component that ships several crates released together (two binaries over a sha
 - Every member sits in `crates/<name>/`. The component root holds only the virtual manifest, the lockfile, and the non-Rust directories
 - `members` lists each crate explicitly, one per line. No `crates/*` glob
 - `resolver = "3"` is set explicitly, because a virtual manifest has no edition to derive it from
-- `[workspace.package]` owns `version`, `edition`, `rust-version`, `authors`, `license`, and `repository`. Members inherit each with `.workspace = true`, so crates that release together cannot drift apart
+- `[workspace.package]` owns `edition`, `rust-version`, `authors`, `license`, and `repository`, inherited with `.workspace = true`. It also owns `version` when the crates release together, so they cannot drift apart. A member that ships as its own image on its own schedule declares its own `version`
+- A second binary that uses none of the first one's library, or carries its own version, is its own member, not a `[[bin]]` in the same package. A `[[bin]]` in one package is for binaries that share the library and the version (a `crdgen` beside its controller)
+- Code two members share (log format, shutdown signal, build version) lives in a `common` member. A test helper another member needs sits behind a `testing` feature that the dependent enables in `[dev-dependencies]`
 - `[workspace.dependencies]` declares every dependency version once, the shared path crate included. Members write `name.workspace = true` and add only the features they need (`tokio = { workspace = true, features = [...] }`)
 - `[workspace.lints]` holds the lint tables and members carry `[lints] workspace = true`. A member cannot add to inherited lints, so a crate-wide allow moves to the workspace with its one-line reason
 - `[profile.release]` exists only in the root manifest. Cargo ignores profiles in member manifests
