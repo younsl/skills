@@ -6,7 +6,7 @@ argument-hint: "[project purpose]"
 license: Apache-2.0
 compatibility: cargo with rustfmt and clippy, plus cargo-zigbuild, zig 0.15.2, and the x86_64 and aarch64 musl targets for addon packaging
 metadata:
-  version: "1.5.0"
+  version: "1.6.0"
   category: generator
   related: dockerfile-generator helm-chart github-actions-generator done-check rust-bump-rerelease
 allowed-tools: Bash(cargo *) Bash(rustc --version) Read Write Edit Grep Glob
@@ -20,6 +20,7 @@ disable-model-invocation: false
 
 - [Output Requirements](#output-requirements)
 - [Project Structure (SRP)](#project-structure-srp)
+- [Workspace](#workspace)
 - [Cargo.toml](#cargotoml)
 - [CRD Generation](#crd-generation)
 - [Build-Time Metadata](#build-time-metadata)
@@ -73,6 +74,40 @@ src/
 | `aws/` | AWS API communication | `aws-sdk-*` |
 | `k8s/` | Kubernetes API communication | `kube`, `k8s-openapi` |
 | `observability/` | Metrics exposition and HTTP | `prometheus`, `axum` |
+
+## Workspace
+
+A component that ships several crates released together (two binaries over a shared library, such as an operator and its node agent) is one [Cargo workspace](https://doc.rust-lang.org/cargo/reference/workspaces.html). A component with one crate stays standalone, and a repository never gets a root workspace across unrelated components.
+
+```
+<component>/
+├── Cargo.toml        # Virtual manifest, no [package]
+├── Cargo.lock        # The only lockfile
+├── crates/
+│   ├── operator/     # Binary crate, with its Dockerfile
+│   ├── agent/        # Binary crate, with its Dockerfile
+│   └── common/       # Shared library, publish = false
+├── charts/
+├── docs/
+└── Makefile
+```
+
+- Every member sits in `crates/<name>/`. The component root holds only the virtual manifest, the lockfile, and the non-Rust directories
+- `members` lists each crate explicitly, one per line. No `crates/*` glob
+- `resolver = "3"` is set explicitly, because a virtual manifest has no edition to derive it from
+- `[workspace.package]` owns `version`, `edition`, `rust-version`, `authors`, `license`, and `repository`. Members inherit each with `.workspace = true`, so crates that release together cannot drift apart
+- `[workspace.dependencies]` declares every dependency version once, the shared path crate included. Members write `name.workspace = true` and add only the features they need (`tokio = { workspace = true, features = [...] }`)
+- `[workspace.lints]` holds the lint tables and members carry `[lints] workspace = true`. A member cannot add to inherited lints, so a crate-wide allow moves to the workspace with its one-line reason
+- `[profile.release]` exists only in the root manifest. Cargo ignores profiles in member manifests
+- One `Cargo.lock` and one `target/` at the workspace root. Scripts and CI read the build directory from `cargo metadata` (`.target_directory`) instead of assuming `target/` beside the crate
+- Each image keeps its Dockerfile in its own crate directory, and the coverage gate runs per binary crate (`cargo llvm-cov -p <crate>`), not on the workspace total
+- Paths from a crate to component files (chart CRDs, examples) climb two levels from `CARGO_MANIFEST_DIR`
+
+| Member manifest | Workspace root manifest |
+|-----------------|-------------------------|
+| `name`, `description`, targets (`[lib]`, `[[bin]]`) | `version`, `edition`, `rust-version`, `license` |
+| Dependency names and extra features | Dependency versions and base features |
+| `[lints] workspace = true` | Lint tables, `[profile.release]`, `resolver` |
 
 ## Cargo.toml
 
@@ -139,5 +174,6 @@ Applies to crates that define a `#[derive(CustomResource)]` type. Priority order
 - A second `cargo build -v` reports `Fresh` for the crate
 - `Cargo.lock` has no `openssl-sys` or `native-tls` package
 - Addons: `make zigbuild` produces both musl binaries
+- Workspaces: no `Cargo.lock`, `[profile.*]`, or lint level below `crates/`, no member manifest pins a dependency version, and `cargo metadata` reports every member under `crates/`
 - CRD crates: `--help` of the runtime binary lists no `crd` command, and editing a chart CRD field makes `cargo test --test crd_drift` fail
 - CRD crates: no `render-crd.py` or other non-Rust render script exists, the `make crd` recipe is only `cargo run --bin crdgen`, and running it on a clean tree leaves `git status` clean
