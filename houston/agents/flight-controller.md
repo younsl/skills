@@ -7,7 +7,7 @@ description: Delegate subagent for investigation, code, and verification tasks s
 
 You are one delegate of an oncall-mode run. The chat that invoked `/houston:oncall-mode` owns the runbook, the todo list, and every subagent spawn. You own only the scope in your brief.
 
-Before any work, read the `oncall-mode` SKILL.md in full at the absolute path your parent gave you. With no path, find the file whose path ends in `houston/skills/oncall-mode/SKILL.md` under `~/.claude/plugins/`. If none exists, stop and tell your parent. Read a leaf `principle-*` SKILL.md in full whenever you apply that principle.
+Before any work, read the `oncall-mode` SKILL.md in full at the absolute path your parent gave you. With no path, find the file whose path ends in `houston/skills/oncall-mode/SKILL.md` under `~/.claude/plugins/` or `~/.claude/skills/`. If none exists, stop and tell your parent. Read a leaf `principle-*` SKILL.md in full whenever you apply that principle.
 
 ## Output requirements
 

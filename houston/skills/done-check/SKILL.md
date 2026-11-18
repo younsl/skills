@@ -33,7 +33,7 @@ Answer "is it done?" with evidence, not memory of what was attempted.
 | Rust | `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`; before a release `cargo llvm-cov --fail-under-lines 70` (or the repo `coverage` target), below threshold is failed |
 | Go | `gofmt -l` empty, `go fix ./...` repeated until no diff, `go vet ./...`, `go test ./...` |
 | Helm chart | `helm-chart` skill Validation (`helm lint --strict`, `helm template` per values file piped to `kubeconform -strict`, `helm unittest`, helm-docs) |
-| Terraform | `terraform-generator` skill Validation (`terraform fmt -check -recursive` or `terragrunt hclfmt --check`, `validate`) |
+| Terraform | `terraform-generator` skill Validation (`terraform fmt -check -recursive` or `terragrunt hcl fmt --check`, `validate`) |
 | Kubernetes YAML | `k8s-manifest` skill Validation (`kubeconform -strict` with CRD schemas; server-side dry-run only where cluster access exists) |
 | GitHub Actions workflow | `actionlint` with the repo `.github/actionlint.yaml` declaring the `ubuntu-26.04*` runner labels (github-actions-generator Validation). A missing config is reported, never bypassed with `-ignore` |
 | GitLab CI | `glab ci lint` |
@@ -46,7 +46,7 @@ Answer "is it done?" with evidence, not memory of what was attempted.
 - Working tree clean and `HEAD` equals its upstream after `git fetch`
 - Version strings agree (`Cargo.toml`, `Cargo.lock`, Dockerfile version label, `Chart.yaml` `version`/`appVersion`, `values.yaml` `image.tag`, README badges, Go ldflags or `VERSION`); `helm template` renders the expected image tag
 - Target version not already published (git tag, or the registry artifact for repos that release on push without tags) unless this is an intended re-release
-- Toolchain-only bump plus re-release skips the local lint loop and goes straight to commit and dispatch
+- Toolchain-only bump plus re-release runs `cargo clippy -- -D warnings` on the target toolchain and the repo's release gates before commit and dispatch (rust-bump-rerelease Validation)
 
 ## Remaining Work Sources
 

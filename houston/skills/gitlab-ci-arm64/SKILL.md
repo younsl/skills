@@ -1,7 +1,7 @@
 ---
 name: gitlab-ci-arm64
 description: Move GitLab CI container image builds onto arm64 runners, as a multi-arch build (amd64 + arm64 + manifest) or a single native arm64 build, chosen by where the app is scheduled.
-when_to_use: Moving a .gitlab-ci.yml image build to arm64 or Graviton, adding or dropping multi-arch or manifest-list jobs, or simplifying docker build steps, e.g. "멀티아치 빌드 전환", "Graviton 전환", "arm64 단일 빌드로 전환", "Gitlab CI arm64 전환", "manifest 잡 추가", "manifest 잡 제거", "buildx 빼고 docker build 로", "CI 주석 정리". Not for GitHub Actions (use github-actions-generator), Dockerfile contents (use dockerfile-generator), or committing and opening the MR (use git-ship).
+when_to_use: Moving a .gitlab-ci.yml image build to arm64 or Graviton, adding or dropping multi-arch or manifest-list jobs, simplifying docker build steps, or cleaning comments in those jobs, e.g. "Graviton 전환", "manifest 잡 추가". Not for GitHub Actions (use github-actions-generator), Dockerfile contents (use dockerfile-generator), or committing and opening the MR (use git-ship).
 argument-hint: "[.gitlab-ci.yml path] [multi|single]"
 license: Apache-2.0
 compatibility: glab (ci lint), docker, kubectl for the rollout check

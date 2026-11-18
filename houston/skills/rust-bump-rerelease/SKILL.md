@@ -18,9 +18,9 @@ disable-model-invocation: false
 
 Bump the Rust toolchain version, update docs, then re-release the named projects at the **same** artifact version.
 
-## Critical: this is a toolchain bump, NOT a version release
+## Artifact versions stay unchanged
 
-The whole point of a *re-release* is that the artifact version is **identical**: only the Rust toolchain changes. **Never bump any of these** while doing this task:
+A re-release keeps the artifact version identical and changes only the Rust toolchain. The release workflow keys off these values, so none of them move in this task:
 
 | Must stay unchanged | Where |
 |---------------------|-------|
@@ -45,7 +45,7 @@ If a request also wants a real version bump, that is a separate `helm-bump` / re
 
 | File | Target | Note |
 |------|--------|------|
-| `Cargo.toml` | `rust-version = "x.y.z"` | Normalize to full semver even if it was minor-only (`"1.95"` → `"1.96.0"`) |
+| `Cargo.toml` | `rust-version = "x.y.z"` | Normalize to full semver even if it was minor-only (`"1.95"` becomes `"1.96.0"`) |
 | `README.md` | shields.io Rust badge `rust-x.y.z`, prose like `Rust x.y.z` | prose only if present |
 | project `AGENTS.md`, `docs/development.md`, `docs/metrics.md` | toolchain mentions | only if present |
 | root `README.md` | `x.y+` link to the release tag | repo-wide bumps |

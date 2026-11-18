@@ -1,7 +1,7 @@
 ---
 name: git-ship
 description: Commit, push, branch, and open or update a GitLab MR or GitHub PR in one pass, following repo branch policy and the user's MR body conventions.
-when_to_use: Short ship requests such as "커밋 푸시", "커밋만", "별도 브랜치에 커밋 푸시", "MR 생성", "MR 제출", "커밋 푸시후 MR 생성", "PR 생성", "MR 업데이트", "MR 분량 30%로 축소", "commit push". Not for tag-based re-releases (use release-retrigger) or verification without shipping (use done-check).
+when_to_use: Short requests in Korean or English to commit, push, branch, or open an MR or PR, and to update or shrink an open MR description, e.g. "커밋 푸시", "MR 생성". Not for tag-based re-releases (use release-retrigger) or verification without shipping (use done-check).
 argument-hint: "[context for 진행배경]"
 license: Apache-2.0
 compatibility: Requires git plus glab (GitLab) or gh (GitHub), authenticated

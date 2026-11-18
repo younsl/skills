@@ -14,10 +14,10 @@ Add a comment only for what the code cannot say, and put history and rationale i
 
 - New keys get no explanatory comment unless a format requires one (doc annotations), and then one short line.
 - No file-header blocks describing change scope, no version-requirement notes, no change history.
-- Existing comments, upstream or not, are left as they are unless the request is about them. Comments that only restate a changed value are removed with it, short label comments stay.
-- Comment density matches the file being edited.
+- Existing comments in first-party files a change edits are deleted, unless one carries history or background a reader truly needs and the code cannot say, or a tool requires its format (doc annotations, lint directives).
+- Upstream and vendored text keeps its comments verbatim (**principle-upstream-is-canon**).
 
 ## Validation
 
 - The diff adds no comment that narrates the change, restates a key, or records history.
-- Comment density of each edited file is unchanged.
+- Every comment left in an edited first-party file is needed history or background, or a tool-required format.

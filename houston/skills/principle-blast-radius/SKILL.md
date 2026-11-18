@@ -17,7 +17,7 @@ Change exactly what was asked, in the place it was asked, and nothing next to it
 - Edits are made file by file against the actual file content. No blind multi-file `sed` across branches or environments that differ.
 - Generators that rewrite more than the target (codegen, examples, formatters) have their out-of-scope output reverted before commit.
 - Vendored and third-party code is never reformatted or auto-fixed.
-- Neighboring comments, ordering, and formatting stay as they are when only a value changes.
+- Neighboring ordering and formatting stay as they are when only a value changes. Comments follow **principle-comments-are-not-changelogs**.
 
 ## Validation
 
