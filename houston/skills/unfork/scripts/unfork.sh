@@ -6,9 +6,9 @@ usage() {
 Usage: unfork.sh [--dry-run] [--root DIR] [--keep NAME]...
 
 Delete every fork owned by the authenticated gh account that has no open
-pull request, on GitHub and in local clones under the root. A fork is kept
-when an open pull request uses it as head or base, or when a local clone
-holds work that exists nowhere else.
+pull request, on GitHub and in local clones under the root, linked worktrees
+included. A fork is kept when an open pull request uses it as head or base,
+or when a local clone or worktree holds work that exists nowhere else.
 
   --dry-run    list what would be deleted, delete nothing
   --root DIR   tree scanned for local clones, 4 levels deep (default: ~/github)
@@ -77,23 +77,46 @@ slug_of() {
     sed 's#\.git$##' | tr '[:upper:]' '[:lower:]'
 }
 
-local_blocker() {
-  local dir=$1
+linked_worktrees() {
+  git -C "$1" worktree list --porcelain 2>/dev/null </dev/null | sed -n 's/^worktree //p' |
+    while IFS= read -r wt; do
+      [ ! -f "$wt/.git" ] || printf '%s\n' "$wt"
+    done
+}
+
+tree_blocker() {
+  local tree=$1
   case "$PWD/" in
-    "$dir"/*)
+    "$tree"/*)
       echo "is the current directory"
       return 0
       ;;
   esac
-  if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
+  if [ -n "$(git -C "$tree" status --porcelain 2>/dev/null)" ]; then
     echo "uncommitted changes"
-  elif [ -n "$(git -C "$dir" stash list 2>/dev/null)" ]; then
-    echo "stash entries"
-  elif [ -n "$(git -C "$dir" log --branches --not --remotes -n 1 --format=%h 2>/dev/null)" ]; then
+  elif [ -n "$(git -C "$tree" log HEAD --branches --not --remotes -n 1 --format=%h 2>/dev/null)" ]; then
     echo "commits not pushed to any remote"
-  elif [ "$(git -C "$dir" worktree list --porcelain 2>/dev/null | grep -c '^worktree ')" -gt 1 ]; then
-    echo "linked worktrees"
   fi
+}
+
+local_blocker() {
+  local dir=$1 blocker wt
+  blocker=$(tree_blocker "$dir")
+  if [ -z "$blocker" ] && [ -n "$(git -C "$dir" stash list 2>/dev/null)" ]; then
+    blocker="stash entries"
+  fi
+  if [ -n "$blocker" ]; then
+    echo "$blocker"
+    return 0
+  fi
+  linked_worktrees "$dir" >"$TMP/wt-check"
+  while IFS= read -r wt; do
+    blocker=$(tree_blocker "$wt")
+    if [ -n "$blocker" ]; then
+      echo "$blocker in worktree $(tilde "$wt")"
+      return 0
+    fi
+  done <"$TMP/wt-check"
 }
 
 LOGIN=$(gh api user --jq .login)
@@ -201,6 +224,10 @@ while IFS=$'\t' read -r name nwo parent inbound; do
   if [ "$DRY_RUN" -eq 1 ]; then
     emit would-delete remote "$nwo" "fork of $parent"
     while IFS= read -r path; do
+      linked_worktrees "$path" >"$TMP/wt"
+      while IFS= read -r wt; do
+        emit would-delete local "$(tilde "$wt")" "worktree of $(tilde "$path")"
+      done <"$TMP/wt"
       emit would-delete local "$(tilde "$path")" "clone of $nwo"
     done <"$TMP/paths"
     n_delete=$((n_delete + 1))
@@ -211,6 +238,15 @@ while IFS=$'\t' read -r name nwo parent inbound; do
     emit deleted remote "$nwo" "fork of $parent"
     n_delete=$((n_delete + 1))
     while IFS= read -r path; do
+      linked_worktrees "$path" >"$TMP/wt"
+      while IFS= read -r wt; do
+        if [ -n "$wt" ] && [ -f "$wt/.git" ] && rm -rf "$wt" 2>/dev/null; then
+          emit deleted local "$(tilde "$wt")" "worktree of $(tilde "$path")"
+        else
+          emit failed local "$(tilde "$wt")" "could not remove worktree"
+          n_failed=$((n_failed + 1))
+        fi
+      done <"$TMP/wt"
       if [ -n "$path" ] && [ -d "$path/.git" ] && rm -rf "$path" 2>/dev/null; then
         emit deleted local "$(tilde "$path")" "clone of $nwo"
       else
