@@ -135,6 +135,7 @@ No runbook fits: write a bespoke one in the todo list from the closest runbook's
 | API timeout investigation | **api-timeout-investigation** |
 | Superset password reset | **superset-password-reset** |
 | Local disk cleanup | **disk-cleanup** |
+| Personal fork cleanup | **unfork** |
 | Jira work items | **jira-issue** |
 | Commit, push, MR or PR | **git-ship** |
 | Verification gate before done | **done-check** |
