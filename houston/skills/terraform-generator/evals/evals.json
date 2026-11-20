@@ -21,6 +21,20 @@
       "prompt": "settlement 서비스 IRSA role 이제 안 쓰니까 테라폼에서 리소스 정리해줘 (terragrunt 레포)",
       "expected_output": "Does not run destroy without an explicit request; hands the exact terragrunt destroy command for each environment's unit to the user first; deletes the terragrunt.hcl files only after destroy is confirmed, never before; dependents that reference the role are checked.",
       "files": []
+    },
+    {
+      "id": 4,
+      "name": "new-s3-backend",
+      "prompt": "신규 프로젝트 테라폼 백엔드 구성해줘. 스테이트 버킷이랑 CI가 쓸 백엔드 IAM role 정책까지 같이 (terragrunt 레포, AWS)",
+      "expected_output": "S3 backend with use_lockfile = true and encrypt = true; required_version >= 1.10.0; state bucket has versioning enabled; no DynamoDB lock table and no dynamodb_table argument; the backend role policy allows get, put, and delete on the .tflock object next to the state key; plan and apply not run.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "migrate-off-dynamodb-lock",
+      "prompt": "지금 백엔드가 S3 + DynamoDB 락 테이블 쓰는데 DynamoDB 걷어내고 싶어. 테라폼 코드 수정해줘 (terragrunt 레포)",
+      "expected_output": "Sets use_lockfile = true while keeping dynamodb_table for one apply, then removes the argument and the table in a second change; never a single change that drops DynamoDB locking before S3 locking is live; the backend role gains get, put, and delete on the .tflock object; required_version >= 1.10.0; plan, apply, and the table destroy are left to the user.",
+      "files": []
     }
   ]
 }
