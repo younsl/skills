@@ -66,6 +66,7 @@ Standard Go practice (wrapped errors, context first, table tests, no package-lev
 - Local instances run on high ports from a config copy outside the repo, never by editing tracked config. Stop them by your own port (`lsof -tiTCP:<port>`), never by a process-name pattern that can hit other sessions
 - Killing `go run` can leave the child binary listening. Check the port is free before a smoke test
 - Tests that need Linux interfaces (`/proc`, cgroups) run in a `golang` container matching `go.mod`, with `-race`
+- Tests of code that calls the AWS SDK prefer a real SDK client pointed at a local AWS Emulator over a hand-written fake, which misses request serialization, async state transitions, and error codes. Fakes stay only for APIs the emulator lacks and for fault injection
 
 ## Validation
 
