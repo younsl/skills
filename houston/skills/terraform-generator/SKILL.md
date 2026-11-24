@@ -1,12 +1,12 @@
 ---
 name: terraform-generator
 description: Write Terraform and Terragrunt code for AWS following the user's state, layout, IAM, and tagging conventions.
-when_to_use: Creating or changing infrastructure code, modules, IAM policies, or tags, e.g. "테라폼 작성", "IAM 정책 추가", "모듈 개선", "terragrunt.hcl 추가", "리소스 정리". Plan and apply run only when the user asks. Not for NodePool, EC2NodeClass, or other Kubernetes YAML (use k8s-manifest) or Helm chart values (use helm-chart).
+when_to_use: Creating or changing infrastructure code, modules, IAM policies, security group rules, or tags, e.g. "테라폼 작성", "IAM 정책 추가", "SG 인바운드 룰 추가", "모듈 개선", "terragrunt.hcl 추가", "리소스 정리". Plan and apply run only when the user asks. Not for NodePool, EC2NodeClass, or other Kubernetes YAML (use k8s-manifest) or Helm chart values (use helm-chart).
 argument-hint: "[resource or module]"
 license: Apache-2.0
 compatibility: terraform or OpenTofu 1.10+, terragrunt 1.x when the repo uses it
 metadata:
-  version: "2.2.0"
+  version: "2.3.0"
   category: generator
   related: done-check git-ship k8s-manifest helm-chart
 allowed-tools: Bash(terraform fmt *) Bash(terraform init -backend=false*) Bash(terraform validate*) Bash(tofu fmt *) Bash(tofu init -backend=false*) Bash(tofu validate*) Bash(terragrunt hcl fmt*) Bash(terragrunt hcl validate*) Read Write Edit Grep Glob
@@ -29,6 +29,14 @@ General practice (pinned providers, variable validation, encryption at rest, lea
 - Each service owns its policies under its own directory; never attach another service's policy even when the permissions match, copy the needed statements instead
 - `Sid` names the feature that needs the permission
 - Policy `description` is a complete English sentence without `/` or parentheses (`Allows the merchant service to read its secrets.`, not `pay/merchant (secret)`)
+
+## Security Groups
+
+- Inbound from a workload in another VPC on the same transit gateway, including VPCs in other accounts sharing it through RAM, references the source security group with `referenced_security_group_id`, never the source VPC or subnet CIDR. A CIDR source admits every address in the range, a reference admits only that workload
+- A cross-VPC reference needs `security_group_referencing_support = "enable"` on the transit gateway and on the VPC attachments of both sides. Check them before writing the rule, and land the enablement as its own change first
+- Transit gateway referencing covers inbound rules only. Outbound rules toward another VPC keep a destination CIDR
+- A CIDR source remains only where a reference cannot reach: another region or transit gateway peering, VPN or Direct Connect, external addresses. Then the narrowest range that covers the source, never the whole VPC CIDR
+- One `aws_vpc_security_group_ingress_rule` per source with a `description` naming the source workload, never inline `ingress` blocks
 
 ## Tags
 

@@ -35,6 +35,13 @@
       "prompt": "지금 백엔드가 S3 + DynamoDB 락 테이블 쓰는데 DynamoDB 걷어내고 싶어. 테라폼 코드 수정해줘 (terragrunt 레포)",
       "expected_output": "Sets use_lockfile = true while keeping dynamodb_table for one apply, then removes the argument and the table in a second change; never a single change that drops DynamoDB locking before S3 locking is live; the backend role gains get, put, and delete on the .tflock object; required_version >= 1.10.0; plan, apply, and the table destroy are left to the user.",
       "files": []
+    },
+    {
+      "id": 6,
+      "name": "tgw-sg-referencing",
+      "prompt": "orders EKS 노드에서 shared 계정 VPC에 있는 RDS 5432 접근 허용하는 SG 인바운드 룰 추가해줘. 두 VPC는 RAM으로 공유된 TGW로 연결돼 있어",
+      "expected_output": "Uses aws_vpc_security_group_ingress_rule with referenced_security_group_id pointing at the orders node security group, never the orders VPC or subnet CIDR; checks security_group_referencing_support is enabled on the transit gateway and both VPC attachments, and treats enabling it as a separate earlier change; rule description names the source workload; no inline ingress blocks; plan and apply not run.",
+      "files": []
     }
   ]
 }
