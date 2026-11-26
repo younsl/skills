@@ -6,10 +6,10 @@ argument-hint: "<project> <rust-version>"
 license: Apache-2.0
 compatibility: gh CLI authenticated, rustup with the target toolchain; repo with _release-rust-scratch-containers.yml workflow
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   category: action
   related: release-retrigger helm-bump release-promote git-ship done-check
-allowed-tools: Bash(git *) Bash(gh *) Bash(cargo *) Bash(curl -s -o /dev/null *) Read Edit Grep Glob
+allowed-tools: Bash(git *) Bash(gh *) Bash(cargo *) Bash(trivy *) Bash(curl -s -o /dev/null *) Read Edit Grep Glob
 user-invocable: true
 disable-model-invocation: false
 ---
@@ -82,5 +82,6 @@ Dispatch one command per project: a shell loop over `gh workflow run` may be den
 - No current-state mention of the old version remains, exact or minor-only: `grep -rnE "<old>\.[0-9]+|[Rr]ust[ -]<old>([^.0-9]|$)|<old> toolchain|<old>\+" box .github README.md --include='*.toml' --include='*.md' --include='*.yml' --exclude=Cargo.lock --exclude=CHANGELOG.md --exclude-dir=target --exclude-dir=node_modules --exclude-dir=designs --exclude-dir=testing --exclude-dir=skills` with `<old>` as the escaped old minor (`1\.99`) returns nothing.
 - `git diff` changes no Dockerfile image label, `Cargo.toml` `version`, or `Chart.yaml` `version`/`appVersion`. Code changes are limited to clippy fixes for the new toolchain.
 - `cargo +<x.y.z> clippy -- -D warnings` passes in every crate whose `rust-version` moved.
+- `trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1` exits 0 in every project about to be re-released. A finding stops the dispatch and is reported, since its fix is a dependency bump outside this task (principle-zero-critical-high).
 - The `cargo-zigbuild` pin in `_release-rust-scratch-containers.yml` stays >= 0.23.0 (rustc 1.98+ aarch64 linker arg).
 - `gh run view <id> --json jobs`: `detect` succeeds and spawns `test (<project>, ...)`, confirming the forced rebuild path was taken.

@@ -6,7 +6,7 @@ argument-hint: "[upstream API or tool group]"
 license: Apache-2.0
 compatibility: the official MCP SDK for the language, an MCP client for smoke tests, helm for rendering bindings
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   category: generator
   related: go-generator rust-generator helm-chart k8s-manifest
 allowed-tools: Bash(go *) Bash(cargo *) Bash(helm *) Bash(kubeconform *) Bash(curl *) Read Write Edit Grep Glob
@@ -59,3 +59,4 @@ disable-model-invocation: false
 - Through the deployed endpoint: list tools, call one read tool with a real caller token, and call it once without a token to see the denial
 - `helm template` of the binding renders, and every server entry is under the tool count limit
 - The metrics endpoint shows the tool call counter after the smoke test
+- done-check vulnerability scan reports zero CRITICAL and zero HIGH (principle-zero-critical-high)

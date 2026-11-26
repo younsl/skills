@@ -15,7 +15,7 @@ Houston, we have a task. [houston](houston) is an SRE skill stack modeled on [ps
 houston/
 ├── skills/
 │   ├── oncall-mode/          entry skill and its runbooks/
-│   ├── principle-*/          24 engineering principles
+│   ├── principle-*/          25 engineering principles
 │   └── <domain skills>/      26 skills: helm-chart, k8s-manifest, terraform-generator, go-generator, ...
 ├── agents/
 │   └── flight-controller.md  delegate subagent used inside a runbook

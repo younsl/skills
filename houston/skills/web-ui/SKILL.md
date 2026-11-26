@@ -6,7 +6,7 @@ argument-hint: "[route or component]"
 license: Apache-2.0
 compatibility: node with the repo's package manager, tsc, eslint, vite, plus a Chrome session for screenshots
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   category: generator
   related: writing-style git-ship done-check diagram
 allowed-tools: Bash(./node_modules/.bin/*) Bash(node *) Bash(curl *) Bash(lsof *) Read Write Edit Grep Glob
@@ -72,3 +72,4 @@ disable-model-invocation: false
 - `grep -rnE '\b(alert|confirm|prompt)\(| title=' <changed files>` adds no new hits
 - The local instance serves the new build (version endpoint or bundle hash matches)
 - Every scenario in the MR has a current screenshot
+- done-check vulnerability scan reports zero CRITICAL and zero HIGH (principle-zero-critical-high)

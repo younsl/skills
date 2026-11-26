@@ -32,6 +32,7 @@ Each trigger below names the principle or skill it applies. In the final reply, 
 - **Credentials on a remote host, pod, or Job:** **principle-no-secrets-in-argv**.
 - **Editing files:** **principle-blast-radius**, **principle-comments-are-not-changelogs**, and the domain skill for the file type (table below).
 - **Shared working tree, index, or state:** **principle-not-your-diff**.
+- **Code, dependencies, Dockerfile, or release pipeline of an artifact you build:** **principle-zero-critical-high**. Zero CRITICAL and zero HIGH, with no exception.
 - **Before calling anything done:** **principle-proof-of-done** and the **done-check** skill.
 - **Commit, push, MR, or PR:** the Shipping runbook and the **git-ship** skill.
 - **Any prose** (reply, MR body, ticket, doc, alert copy): the **writing-style** skill and **principle-3am-reader**. Any image or deck: the **diagram** skill.
@@ -48,6 +49,7 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 - **principle-its-always-dns.** Answering "what happened" in an analysis, impact assessment, or incident report.
 - **principle-before-and-after.** Claiming a speedup, a behavior-preserving refactor, a no-op codification, or a component swap.
 - **principle-outcome-over-motion.** A change is a means to an end, such as a CVE fix or a compatibility fix.
+- **principle-zero-critical-high.** Changing code, dependencies, a Dockerfile, a base image, or a release pipeline of an artifact you build, and before any release.
 
 **Change safety**
 

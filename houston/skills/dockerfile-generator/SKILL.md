@@ -6,7 +6,7 @@ argument-hint: "[app or Dockerfile path]"
 license: Apache-2.0
 compatibility: hadolint, docker buildx or podman, trivy
 metadata:
-  version: "2.1.0"
+  version: "2.2.0"
   category: generator
   related: github-actions-generator gitlab-ci-arm64 rust-generator release-retrigger
 allowed-tools: Bash(hadolint *) Bash(docker *) Bash(podman *) Bash(trivy *) Bash(go build *) Bash(cargo zigbuild *) Bash(file *) Read Write Edit Grep Glob
@@ -42,4 +42,4 @@ Generic practice (pinned bases, no secrets, cache-friendly layer order, `.docker
 
 - `hadolint Dockerfile` exits 0, with `# hadolint ignore=DL3018` on the certs stage `apk add --no-cache ca-certificates`
 - Local check, not a CI instruction: `docker buildx build --platform linux/amd64,linux/arm64` (or `podman build --platform linux/amd64,linux/arm64 --manifest <name>`) succeeds after both per-arch binaries are built
-- `trivy image` reports no fixable HIGH or CRITICAL
+- `trivy image --severity HIGH,CRITICAL --exit-code 1 <image>` exits 0, unfixed findings included (principle-zero-critical-high)

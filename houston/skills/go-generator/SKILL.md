@@ -6,7 +6,7 @@ argument-hint: "[package or feature]"
 license: Apache-2.0
 compatibility: go toolchain matching go.mod, gofmt, go vet, plus docker or podman for Linux-only tests on macOS
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   category: generator
   related: done-check dockerfile-generator mcp-server web-ui helm-chart
 allowed-tools: Bash(go *) Bash(gofmt *) Bash(make *) Bash(docker run *) Bash(podman run *) Bash(curl *) Bash(lsof *) Read Write Edit Grep Glob
@@ -74,3 +74,4 @@ Standard Go practice (wrapped errors, context first, table tests, no package-lev
 - `go fix -diff ./...` prints nothing
 - `go vet ./...` and `go test ./...` pass, with `-race` where the repo uses it
 - New `Help` strings are English and new label names are outside the reserved list
+- done-check vulnerability scan reports zero CRITICAL and zero HIGH (principle-zero-critical-high)

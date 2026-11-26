@@ -6,7 +6,7 @@ argument-hint: "[workflow purpose]"
 license: Apache-2.0
 compatibility: actionlint and zizmor optional for validation (zizmor runs through uvx when not installed)
 metadata:
-  version: "2.1.0"
+  version: "2.2.0"
   category: generator
   related: dockerfile-generator gitlab-ci-arm64 release-retrigger rust-bump-rerelease
 allowed-tools: Bash(actionlint *) Bash(zizmor *) Bash(uvx zizmor*) Read Write Edit Grep Glob
@@ -25,7 +25,8 @@ Pinned runner labels and the four binary targets are global policy (AGENTS.md).
 - Push events release every project whose version file changed anywhere in the push (`.github/scripts/ci-changed-files.sh`, checkout with `fetch-depth: 0`). Never default a push to one project
 - `workflow_dispatch` inputs: a `choice` of projects (named `project`, or `container` in `release-containers.yml`), plus `force` (boolean) to rebuild and overwrite an existing version. `_release-charts.yml` keeps its free `chart` string (empty releases all) and `box/**/Chart.yaml` push path
 - Re-releases use `force`, never package deletion
-- Gate order: fmt, lint, test, coverage threshold, then build and push; a failed gate skips the push
+- Gate order: fmt, lint, test, coverage threshold, vulnerability scan, then build and push; a failed gate skips the push
+- The vulnerability scan runs a version-pinned trivy CLI: `trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1` on the project directory, plus `trivy image` with the same flags for images that carry OS packages. No `--ignore-unfixed`, no `.trivyignore`, and no `continue-on-error` (principle-zero-critical-high)
 - Native arm64 runners build arm64; no QEMU emulation for compilation
 - Containers that compile inside the Dockerfile push one platform per native runner by digest (`push-by-digest=true`), then a merge job runs `docker buildx imagetools create` with the version tag
 - musl scratch-container builds keep the exact pins `ziglang==0.15.2` (newer zig leaks RSS in static musl binaries) and `cargo-zigbuild --version 0.23.0` (the minimum that accepts rustc 1.98+ aarch64 linker args), then copy prebuilt binaries into one two-platform buildx call
@@ -37,4 +38,5 @@ Pinned runner labels and the four binary targets are global policy (AGENTS.md).
 
 - `actionlint` passes with `.github/actionlint.yaml` declaring `self-hosted-runner.labels: [ubuntu-26.04, ubuntu-26.04-arm]` (actionlint 1.7.12 does not know these labels). Add that file when missing, never pass `-ignore`
 - `zizmor --min-severity high` (or `uvx zizmor`) adds no high findings beyond `unpinned-uses`
+- `grep -nE 'ignore-unfixed|ignorefile|continue-on-error' <workflow>` shows no hit on a scan step, and the scan job is in the `needs` chain of every publish job
 - In workflows with a project `choice`, every dispatch option has a project directory and a detect entry (`case` arm or `ci-rust-projects.json` key), and every project in push `paths` is a dispatch option

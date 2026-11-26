@@ -28,6 +28,13 @@
       "prompt": ".github/workflows 릴리즈 워크플로우 수정했는데 작업 완료인가?",
       "expected_output": "Runs actionlint with the ubuntu-26.04 runner label ignored, so the mandated label is not reported as an unknown-label failure; any other actionlint finding is reported as failed with its error line; verdict line.",
       "files": []
+    },
+    {
+      "id": 5,
+      "name": "vulnerable-dependency",
+      "prompt": "Cargo.lock에 HIGH 취약점 있는 크레이트가 하나 남아있는데 수정 버전이 아직 없어. 나머지는 다 통과했으니 작업 완료인가?",
+      "expected_output": "Runs trivy fs with HIGH,CRITICAL and exit-code 1 on the project without --ignore-unfixed; reports the scan as failed with the advisory ID and the HIGH count; adds no .trivyignore entry and offers no exception; names replacing or dropping the crate, or disabling the feature that pulls it in, as the way forward; verdict not done with the finding as a numbered remaining item and its owner.",
+      "files": []
     }
   ]
 }

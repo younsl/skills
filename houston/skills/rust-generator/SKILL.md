@@ -6,7 +6,7 @@ argument-hint: "[project purpose]"
 license: Apache-2.0
 compatibility: cargo with rustfmt and clippy, plus cargo-zigbuild, zig 0.15.2, and the x86_64 and aarch64 musl targets for addon packaging
 metadata:
-  version: "1.6.1"
+  version: "1.6.2"
   category: generator
   related: dockerfile-generator helm-chart github-actions-generator done-check rust-bump-rerelease
 allowed-tools: Bash(cargo *) Bash(rustc --version) Read Write Edit Grep Glob
@@ -179,3 +179,4 @@ Applies to crates that define a `#[derive(CustomResource)]` type. Priority order
 - Workspaces: no `Cargo.lock`, `[profile.*]`, or lint level below `crates/`, no member manifest pins a dependency version, and `cargo metadata` reports every member under `crates/`
 - CRD crates: `--help` of the runtime binary lists no `crd` command, and editing a chart CRD field makes `cargo test --test crd_drift` fail
 - CRD crates: no `render-crd.py` or other non-Rust render script exists, the `make crd` recipe is only `cargo run --bin crdgen`, and running it on a clean tree leaves `git status` clean
+- done-check vulnerability scan reports zero CRITICAL and zero HIGH (principle-zero-critical-high)
